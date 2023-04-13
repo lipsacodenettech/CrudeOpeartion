@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-lone-blocks */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unused-vars */
@@ -6,123 +7,102 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
+import {
+  useDeleteCarMutation,
+  useInsertNewCarMutation,
+  useLazyGetAllCarQuery,
+  useUpdateCarMutation,
+} from "./services/api";
 
 export default function Adduser(e) {
-  const [Name, setName] = useState("");
-  const [Color, SetColor] = useState("");
-  const [Brand, SetBrand] = useState("");
-  const [Price, SetPrice] = useState("");
   const [SelectedId, setSelectedID] = useState();
   const [Id, setId] = useState(null);
   const [Result, setResult] = useState([]);
   const [Cars, setCars] = useState([]);
   const [ButtonTxt, setButtonTxt] = useState("update cars");
-  const [isUpdate, setIsUpdate] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [carData, setCarData] = useState({
+    name: null,
+    color: null,
+    brand: null,
+    price: null,
+  });
+
+  const handleChange = (e) => {
+    setCarData({
+      ...carData,
+      [e.target.name]: e.target.value,
+    });
+    // console.log(e.target.name, e.target.value);
+  };
+  const [getCars, result] = useLazyGetAllCarQuery();
+  const { isSuccess, isFetching, isError, error } = result;
+  useEffect(() => {
+    getCars();
+  }, []);
 
   useEffect(() => {
-    getdata();
-  }, []);
-  function AddNewCar() {
-    // e.preventDefault();
-    axios
-      .post(
-        "http://192.168.1.17:3001/cars/insert",
-        {
-          name: Name,
-          brand: Brand,
-          color: Color,
-          price: Price,
-        },
-        {
-          headers: {
-            Authorization:
-              "Berear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxpcHNhQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMTIzNDUiLCJpYXQiOjE2ODExODg3MTR9.UjwNxXB8fz6pbf1LbZX27oNmxzngT56AU_w4B4qY-Vk",
-          },
-        }
-      )
-      .then(function (response) {
-        console.log(response);
-        alert("inserted");
-        getdata();
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
-  function getdata() {
-    axios
-      .get("http://192.168.1.17:3001/cars/getdata", {
-        headers: {
-          authorization:
-            "Berear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxpcHNhQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMTIzNDUiLCJpYXQiOjE2ODExODg3MTR9.UjwNxXB8fz6pbf1LbZX27oNmxzngT56AU_w4B4qY-Vk",
-        },
-      })
-      .then(function (response) {
-        console.log(response.data);
-        setResult(response.data);
-        // setLoader(true)
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
+    if (isSuccess && !isFetching) {
+      console.log(result);
+      setResult(result.data);
+    }
+  }, [isSuccess, isFetching]);
+  const [delteCars] = useDeleteCarMutation();
   const del = (id) => {
-    console.log(id);
-    axios
-      .delete(`http://192.168.1.17:3001/cars/deletedata/${id}`, {
-        headers: {
-          authorization:
-            "Berear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxpcHNhQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMTIzNDUiLCJpYXQiOjE2ODExODg3MTR9.UjwNxXB8fz6pbf1LbZX27oNmxzngT56AU_w4B4qY-Vk",
-        },
-      })
-      .then(function (response) {
-        console.log(response);
-        console.log(id);
-        getdata();
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    delteCars(id);
+    getCars({});
   };
   function selectUser(data) {
-    // let item = Cars[SelectedId - 1];
+    setCarData(data);
     console.log(data);
     setSelectedID(data._id);
-    setName(data.name);
-    SetColor(data.color);
-    SetBrand(data.brand);
-    SetPrice(data.price);
   }
-  const updateUser = (SelectedId) => {
-    let item = { Name, Color, Price, Brand };
-    console.warn("item", item);
-    console.log("update", SelectedId);
-    setIsUpdate(false);
-    axios
-      .put(
-        `http://192.168.1.17:3001/cars/update/${SelectedId}`,
-        {
-          name: Name,
-          brand: Brand,
-          color: Color,
-          price: Price,
-        },
-        {
-          headers: {
-            Authorization:
-              "Berear eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxpcHNhQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMTIzNDUiLCJpYXQiOjE2ODExODg3MTR9.UjwNxXB8fz6pbf1LbZX27oNmxzngT56AU_w4B4qY-Vk",
-          },
-        }
-      )
-      .then(function (response) {
-        console.log(response);
-        getdata();
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+  const update = {
+    carData: {
+      name: carData.name,
+      brand: carData.brand,
+      price: carData.price,
+      color: carData.color,
+    },
+    SelectedId,
   };
+  const [UpdateCar, Updateresult] = useUpdateCarMutation();
+  const {
+    isSuccess: isupSuccess,
+    isFetching: isupFetching,
+    isError: isuprError,
+    error: upError,
+  } = Updateresult;
+  const updateUser = () => {
+    UpdateCar(update);
+    console.log("upadte", update);
+  };
+  useEffect(() => {
+    if (isupSuccess && !isupFetching) {
+      getCars({});
+    }
+  }, [isupSuccess, isupFetching]);
+  const [InsertNewCar, CarResult] = useInsertNewCarMutation();
+  const {
+    isSuccess: isCarSuccess,
+    isFetching: isCarFetching,
+    isError: isCarError,
+    error: carError,
+  } = CarResult;
+  function AddNewCar() {
+    carData.name = "";
+    carData.color = "";
+    carData.price = "";
+    carData.brand = "";
+    InsertNewCar(carData);
+    console.log(CarResult);
+  }
+  useEffect(() => {
+    if ((isCarSuccess && !isCarFetching) || (isupSuccess && isupFetching)) {
+      getCars({});
+    }
+  }, [isCarSuccess, isCarFetching, isupSuccess, isupFetching]);
+
   return (
     <div>
       Adduser page <br />
@@ -148,7 +128,7 @@ export default function Adduser(e) {
           </tr>
         </thead>
         <tbody>
-          {Result.map((i, j) => {
+          {Result.map((i) => {
             return (
               <tr>
                 <td> {i.name}</td>
@@ -205,44 +185,40 @@ export default function Adduser(e) {
           <tr>
             <input
               type="text"
-              value={Name}
+              name="name"
+              value={carData.name}
               placeholder="CAR NAME"
-              onChange={(e) => {
-                setName(e.target.value);
-              }}
+              onChange={handleChange}
               className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
             />
           </tr>
           <tr>
             <input
               type="text"
-              value={Color}
+              name="color"
+              value={carData.color}
               placeholder="Color"
-              onChange={(e) => {
-                SetColor(e.target.value);
-              }}
+              onChange={handleChange}
               className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
             />
           </tr>
           <tr>
             <input
+              name="price"
               type="text"
-              value={Price}
+              value={carData.price}
               placeholder="CAR Price"
-              onChange={(e) => {
-                SetPrice(e.target.value);
-              }}
+              onChange={handleChange}
               className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
             />
           </tr>
           <tr>
             <input
+              name="brand"
               type="text"
-              value={Brand}
+              value={carData.brand}
               placeholder="CAR Brand"
-              onChange={(e) => {
-                SetBrand(e.target.value);
-              }}
+              onChange={handleChange}
               className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
             />
           </tr>

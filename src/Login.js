@@ -9,7 +9,7 @@ export default function Login() {
   const handleSubmit = (e) => {
     axios
       .post(
-        "http://192.168.1.17:3001/login",
+        "http://192.168.1.7:3001/login",
         {
           email: getEmail,
           password: getPassword,
