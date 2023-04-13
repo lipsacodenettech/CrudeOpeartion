@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const carApi = createApi({
   reducerPath: "carApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://192.168.1.7:3001/cars/",
+    baseUrl: process.env.REACT_APP_BASE_URL,
     prepareHeaders: (headers) => {
       headers.set(
         "Authorization",

@@ -90,10 +90,6 @@ export default function Adduser(e) {
     error: carError,
   } = CarResult;
   function AddNewCar() {
-    carData.name = "";
-    carData.color = "";
-    carData.price = "";
-    carData.brand = "";
     InsertNewCar(carData);
     console.log(CarResult);
   }
@@ -112,6 +108,10 @@ export default function Adduser(e) {
         onClick={() => {
           setButtonTxt("Add new");
           setIsModalOpen(true);
+          carData.name = "";
+          carData.color = "";
+          carData.price = "";
+          carData.brand = "";
         }}
       >
         Add New cars
