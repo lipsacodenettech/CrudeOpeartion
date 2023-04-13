@@ -29,7 +29,10 @@ export default function Adduser(e) {
       .post(
         "http://192.168.1.17:3001/cars/insert",
         {
-       
+          name: Name,
+          brand: Brand,
+          color: Color,
+          price: Price,
         },
         {
           headers: {
