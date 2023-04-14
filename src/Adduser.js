@@ -28,6 +28,7 @@ export default function Adduser(e) {
     price: null,
   });
 
+  // console.log(Result);
   const handleChange = (e) => {
     setCarData({
       ...carData,
@@ -43,8 +44,8 @@ export default function Adduser(e) {
 
   useEffect(() => {
     if (isSuccess && !isFetching) {
-      console.log(result);
-      setResult(result.data);
+      setResult(result?.data.length > 0 ? result.data : []);
+      console.log(result.data);
     }
   }, [isSuccess, isFetching]);
   const [delteCars] = useDeleteCarMutation();
@@ -128,13 +129,13 @@ export default function Adduser(e) {
           </tr>
         </thead>
         <tbody>
-          {Result.map((i) => {
+          {Result?.map((i) => {
             return (
               <tr>
-                <td> {i.name}</td>
-                <td>{i.color}</td>
-                <td>{i.price}</td>
-                <td>{i.brand}</td>
+                <td> {i?.name}</td>
+                <td>{i?.color}</td>
+                <td>{i?.price}</td>
+                <td>{i?.brand}</td>
                 <td>
                   <button
                     className="btn btn-primary"
