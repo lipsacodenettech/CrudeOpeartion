@@ -3,48 +3,67 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { registerSchema } from "./schemas/regirster.jsx";
+import { useFormik } from "formik";
 
 export default function Signup() {
-  const [getName, setName] = useState("");
-  const [getEmail, setEmail] = useState("");
-  const [getPassword, setPassword] = useState("");
-  const [getAge, setAge] = useState("");
+  // const [getName, setName] = useState("");
+  // const [getEmail, setEmail] = useState("");
+  // const [getPassword, setPassword] = useState("");
+  // const [getAge, setAge] = useState("");
   const [get, setget] = useState([]);
-
-  const registerclick = () => {
-    if (
-      document.getElementById("name") == "" ||
-      document.getElementById("email") == "" ||
-      document.getElementById("password") == "" ||
-      document.getElementById("retype_password") == ""
-    ) {
-      alert("Fields are empty.");
-      return;
-    }
-    axios
-      .post("http://192.168.1.7:3001/register", {
-        name: getName,
-        email: getEmail,
-        password: getPassword,
-        age: getAge,
-      })
-      .then(function (response) {
-        // handle success
-        console.log(response);
-        // if(response.data == true){
-        //   alert("succes");
-        // }
-        alert("success");
-        document.getElementById("name").value = "";
-        document.getElementById("email").value = "";
-        document.getElementById("password").value = "";
-        document.getElementById("retype_password").value = "";
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      });
+  const initialValues = {
+    name: "",
+    email: "",
+    password: "",
+    age: "",
   };
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
+    useFormik({
+      initialValues,
+      validationSchema: registerSchema,
+      onSubmit: (values, action) => {
+        if (
+          document.getElementById("name") == "" ||
+          document.getElementById("email") == "" ||
+          document.getElementById("password") == "" ||
+          document.getElementById("retype_password") == ""
+        ) {
+          alert("Fields are empty.");
+          return;
+        }
+        axios
+          .post("http://192.168.1.5:3001/register", {
+            name: values.name,
+            email: values.email,
+            password: values.password,
+            age: values.age,
+          })
+          .then(function (response) {
+            // handle success
+            console.log(response);
+            // if(response.data == true){
+            //   alert("succes");
+            // }
+            alert("success");
+            document.getElementById("name").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("age").value = "";
+            // window.location.href = '/'
+          })
+          .catch(function (error) {
+            // handle error
+            console.log(error);
+          });
+      },
+    });
+
+  console.log(
+    "🚀 ~ file: Registration.jsx ~ line 25 ~ Registration ~ errors",
+    errors
+  );
+  const registerclick = () => {};
 
   return (
     <div>
@@ -68,30 +87,50 @@ export default function Signup() {
                   type="text"
                   className=" h-10 mt-[2%]  w-[48%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease   appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                   placeholder="Enter your name"
-                  value={getName}
-                  onChange={(e) => setName(e.target.value)}
+                  name="name"
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                 />
+                {errors.name && touched.name ? (
+                  <p className="form-error">{errors.name}</p>
+                ) : null}
                 <input
                   type="email"
                   className=" h-10 mt-[2%]  w-[48%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease   appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                   placeholder="Enter your email"
-                  value={getEmail}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                 />
+                {errors.email && touched.email ? (
+                  <p className="form-error">{errors.email}</p>
+                ) : null}
                 <input
                   type="password"
                   className=" h-10 w-[48%]  mt-[2%]  focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block  appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                   placeholder="Enter your password"
-                  value={getPassword}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  value={values.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                 />
+                {errors.password && touched.password ? (
+                  <p className="form-error">{errors.password}</p>
+                ) : null}
                 <input
-                  type="text"
+                  type="number"
                   className=" h-10 w-[48%]  mt-[2%]  focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block  appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                   placeholder="Enter your age"
-                  value={getAge}
-                  onChange={(e) => setAge(e.target.value)}
+                  name="age"
+                  value={values.age}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                 />
+                {errors.age && touched.age ? (
+                  <p className="form-error">{errors.age}</p>
+                ) : null}
               </div>
               <div className="form-check form-switch">
                 <input
@@ -107,19 +146,25 @@ export default function Signup() {
                   Remember me
                 </label>
               </div>
-              <Link to="/">
                 <button
-                  onClick={registerclick}
+                  onClick={handleSubmit}
                   className="w-full px-16 py-3.5 mt-6 mb-4 font-bold leading-normal text-center text-white align-middle transition-all bg-cyan-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-sm ease-in tracking-tight-rem shadow-md bg-150 bg-x-25"
-                  disabled={!getName || !getEmail || !getPassword}
+                  disabled={
+                    !values.name ||
+                    !values.email ||
+                    !values.password ||
+                    !values.age
+                  }
                 >
                   Register
                 </button>
-              </Link>
             </form>
             <div className=" text-center capitalize text-slate-600 text-sm font-bold tracking-wide">
               Allredy have an account !
-              <a href="/"  className="capitalize text-cyan-600 text-xs text-right font-bold">
+              <a
+                href="/"
+                className="capitalize text-cyan-600 text-xs text-right font-bold"
+              >
                 sign in
               </a>
             </div>

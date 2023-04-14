@@ -28,6 +28,20 @@ export default function Adduser(e) {
     price: null,
   });
 
+  function img(id,img) {
+    var formdata = new FormData();
+    formdata.append("car_file", img);
+    axios
+      .post(`http://192.168.1.5:3001/cars/uplode/${id}`, formdata, {
+        headers: { Authorization: `bearer ` + localStorage.token },
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
   // console.log(Result);
   const handleChange = (e) => {
     setCarData({
@@ -117,6 +131,7 @@ export default function Adduser(e) {
       >
         Add New cars
       </button>
+      <form action=""></form>
       <table className="table table-striped">
         <thead>
           <tr>
@@ -136,6 +151,18 @@ export default function Adduser(e) {
                 <td>{i?.color}</td>
                 <td>{i?.price}</td>
                 <td>{i?.brand}</td>
+                <td>
+                  <input
+                    name="file"
+                    type="file"
+                    onChange={(e) => {
+                      // setimg(e.target.files[0]);
+                      // setId(i.i_id)
+                      img(i._id,e.target.files[0]);
+                      // console.log(e.target.files[0]);
+                    }}
+                  />
+                </td>
                 <td>
                   <button
                     className="btn btn-primary"
