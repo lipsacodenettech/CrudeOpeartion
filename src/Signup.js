@@ -33,7 +33,7 @@ export default function Signup() {
           return;
         }
         axios
-          .post("http://192.168.1.5:3001/register", {
+          .post("http://192.168.1.8:3001/register", {
             name: values.name,
             email: values.email,
             password: values.password,

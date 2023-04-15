@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/img-redundant-alt */
+/* eslint-disable no-use-before-define */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-lone-blocks */
 /* eslint-disable array-callback-return */
@@ -13,9 +15,35 @@ import {
   useLazyGetAllCarQuery,
   useUpdateCarMutation,
 } from "./services/api";
+import { Card } from "react-bootstrap";
+
+// Just some styles
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 50,
+  },
+  preview: {
+    marginTop: 50,
+    display: "flex",
+    flexDirection: "column",
+  },
+  image: { maxWidth: "100%", maxHeight: 320 },
+  delete: {
+    cursor: "pointer",
+    padding: 15,
+    background: "red",
+    color: "white",
+    border: "none",
+  },
+};
 
 export default function Adduser(e) {
   const [SelectedId, setSelectedID] = useState();
+  const [selectedImage, setSelectedImage] = useState();
   const [Id, setId] = useState(null);
   const [Result, setResult] = useState([]);
   const [Cars, setCars] = useState([]);
@@ -26,29 +54,28 @@ export default function Adduser(e) {
     color: null,
     brand: null,
     price: null,
+    car_file: null,
   });
 
-  function img(id,img) {
-    var formdata = new FormData();
-    formdata.append("car_file", img);
-    axios
-      .post(`http://192.168.1.5:3001/cars/uplode/${id}`, formdata, {
-        headers: { Authorization: `bearer ` + localStorage.token },
-      })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
+  // This function will be triggered when the "Remove This Image" button is clicked
+  const removeSelectedImage = () => {
+    setSelectedImage();
+  };
+
+  const imageChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedImage(e.target.files[0]);
+      setCarData({
+        ...carData,
+        car_file: e.target.files[0],
       });
-  }
-  // console.log(Result);
+    }
+  };
   const handleChange = (e) => {
     setCarData({
       ...carData,
       [e.target.name]: e.target.value,
     });
-    // console.log(e.target.name, e.target.value);
   };
   const [getCars, result] = useLazyGetAllCarQuery();
   const { isSuccess, isFetching, isError, error } = result;
@@ -69,18 +96,11 @@ export default function Adduser(e) {
   };
   function selectUser(data) {
     setCarData(data);
-    console.log(data);
+    setImgUrl(`${process.env.REACT_APP_PUBLIC_URL}/file/${data.image}`);
     setSelectedID(data._id);
+    setSelectedImage("");
   }
-  const update = {
-    carData: {
-      name: carData.name,
-      brand: carData.brand,
-      price: carData.price,
-      color: carData.color,
-    },
-    SelectedId,
-  };
+
   const [UpdateCar, Updateresult] = useUpdateCarMutation();
   const {
     isSuccess: isupSuccess,
@@ -89,8 +109,23 @@ export default function Adduser(e) {
     error: upError,
   } = Updateresult;
   const updateUser = () => {
+    var formdata = new FormData();
+    if (selectedImage) {
+      formdata.append("car_file", selectedImage);
+    } else {
+      formdata.append("car_file", carData.car_file);
+    }
+    formdata.append("name", carData.name);
+    formdata.append("price", carData.price);
+    formdata.append("brand", carData.brand);
+    formdata.append("color", carData.color);
+
+    const update = {
+      formdata,
+      SelectedId,
+    };
     UpdateCar(update);
-    console.log("upadte", update);
+    console.log(update, "update");
   };
   useEffect(() => {
     if (isupSuccess && !isupFetching) {
@@ -104,9 +139,16 @@ export default function Adduser(e) {
     isError: isCarError,
     error: carError,
   } = CarResult;
+
+  const [imagUrl, setImgUrl] = useState("");
   function AddNewCar() {
-    InsertNewCar(carData);
-    console.log(CarResult);
+    var formdata = new FormData();
+    formdata.append("car_file", carData.car_file);
+    formdata.append("name", carData.name);
+    formdata.append("price", carData.price);
+    formdata.append("brand", carData.brand);
+    formdata.append("color", carData.color);
+    InsertNewCar(formdata);
   }
   useEffect(() => {
     if ((isCarSuccess && !isCarFetching) || (isupSuccess && isupFetching)) {
@@ -139,6 +181,7 @@ export default function Adduser(e) {
             <th scope="col">color</th>
             <th scope="col">price</th>
             <th scope="col">brand</th>
+            <th scope="col">image</th>
             <th scope="col">edit</th>
             <th scope="col">delete</th>
           </tr>
@@ -151,18 +194,20 @@ export default function Adduser(e) {
                 <td>{i?.color}</td>
                 <td>{i?.price}</td>
                 <td>{i?.brand}</td>
+                {/* <td>{i?.car_file}</td> */}
                 <td>
-                  <input
-                    name="file"
-                    type="file"
-                    onChange={(e) => {
-                      // setimg(e.target.files[0]);
-                      // setId(i.i_id)
-                      img(i._id,e.target.files[0]);
-                      // console.log(e.target.files[0]);
-                    }}
-                  />
+                  <button on>
+                    <img
+                      src={`http://192.168.1.8:3001/file/${i.image}`}
+                      className="img-fluid"
+                      alt="profile-image"
+                      height="150px"
+                      width="150px"
+                      // onClick={setIsModalOpen(true)}
+                    />
+                  </button>
                 </td>
+                {/* <img src={file} /> */}
                 <td>
                   <button
                     className="btn btn-primary"
@@ -249,6 +294,28 @@ export default function Adduser(e) {
               onChange={handleChange}
               className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
             />
+          </tr>
+          <tr>
+            <td>
+              <input name="file" type="file" onChange={(e) => imageChange(e)} />
+
+              {!selectedImage || selectedImage === "" ? (
+                <div style={styles.preview}>
+                  <img src={imagUrl} style={styles.image} alt="Thumb" />
+                </div>
+              ) : (
+                <div style={styles.preview}>
+                  <img
+                    src={URL.createObjectURL(selectedImage)}
+                    style={styles.image}
+                    alt=""
+                  />
+                  <button onClick={removeSelectedImage} style={styles.delete}>
+                    Remove This Image
+                  </button>
+                </div>
+              )}
+            </td>
           </tr>
           <tr>
             <button

@@ -43,7 +43,7 @@ export const carApi = createApi({
       query: (update) => ({
         url: `update/${update.SelectedId}`,
         method: "PUT",
-        body: update.carData,
+        body: update.formdata,
       }),
     }),
   }),
