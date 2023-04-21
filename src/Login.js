@@ -29,7 +29,7 @@ export default function Login() {
       onSubmit: (values, action) => {
          axios
           .post(
-            "http://192.168.1.8:3001/login",
+            "http://192.168.1.5:8001/login",
             {
               email: values.email,
               password: values.password,
@@ -45,7 +45,7 @@ export default function Login() {
             // console.log(response);
             if (response.status == "200") {
               localStorage.setItem("email", values.email);
-              window.location.href = "/adduser";
+              // window.location.href = "/adduser";
               localStorage.setItem("token", response.data.data.token);
               // localStorage.setItem("token", response.data.data.Rtoken)
               // console.log("loginResponse", `localStorage set with token value: ${response.data.data.token}`)

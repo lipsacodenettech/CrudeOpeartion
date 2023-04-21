@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-responsive-modal/styles.css";
+import ImageUploading from 'react-images-uploading';
 import { Modal } from "react-responsive-modal";
 import {
   useDeleteCarMutation,
@@ -15,7 +16,7 @@ import {
   useLazyGetAllCarQuery,
   useUpdateCarMutation,
 } from "./services/api";
-import { Card } from "react-bootstrap";
+// import { Card } from "react-bootstrap";
 
 // Just some styles
 const styles = {
@@ -42,11 +43,13 @@ const styles = {
 };
 
 export default function Adduser(e) {
+  const [images, setImages] = React.useState([]);
+  const maxNumber = 69;
   const [SelectedId, setSelectedID] = useState();
   const [selectedImage, setSelectedImage] = useState();
-  const [Id, setId] = useState(null);
+  const [IsImageChanging, setIsImageChanging] = useState(false);
   const [Result, setResult] = useState([]);
-  const [Cars, setCars] = useState([]);
+  const [imagUrl, setImgUrl] = useState("");
   const [ButtonTxt, setButtonTxt] = useState("update cars");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [carData, setCarData] = useState({
@@ -56,7 +59,11 @@ export default function Adduser(e) {
     price: null,
     car_file: null,
   });
-
+ const onChange = (imageList, addUpdateIndex) => {
+    // data for submit
+    console.log(imageList, addUpdateIndex);
+    setImages(imageList);
+  };
   // This function will be triggered when the "Remove This Image" button is clicked
   const removeSelectedImage = () => {
     setSelectedImage();
@@ -108,22 +115,18 @@ export default function Adduser(e) {
     isError: isuprError,
     error: upError,
   } = Updateresult;
-  const updateUser = () => {
-    var formdata = new FormData();
-    if (selectedImage) {
-      formdata.append("car_file", selectedImage);
-    } else {
-      formdata.append("car_file", carData.car_file);
-    }
-    formdata.append("name", carData.name);
-    formdata.append("price", carData.price);
-    formdata.append("brand", carData.brand);
-    formdata.append("color", carData.color);
+  var formdata = new FormData();
+  formdata.append("car_file", carData.car_file);
+  formdata.append("name", carData.name);
+  formdata.append("price", carData.price);
+  formdata.append("brand", carData.brand);
+  formdata.append("color", carData.color);
 
-    const update = {
-      formdata,
-      SelectedId,
-    };
+  const update = {
+    formdata,
+    SelectedId,
+  };
+  const updateUser = () => {
     UpdateCar(update);
     console.log(update, "update");
   };
@@ -140,7 +143,6 @@ export default function Adduser(e) {
     error: carError,
   } = CarResult;
 
-  const [imagUrl, setImgUrl] = useState("");
   function AddNewCar() {
     var formdata = new FormData();
     formdata.append("car_file", carData.car_file);
@@ -165,10 +167,13 @@ export default function Adduser(e) {
         onClick={() => {
           setButtonTxt("Add new");
           setIsModalOpen(true);
+          setSelectedImage("");
+          setIsImageChanging(false);
           carData.name = "";
           carData.color = "";
           carData.price = "";
           carData.brand = "";
+          carData.car_file = "";
         }}
       >
         Add New cars
@@ -194,20 +199,21 @@ export default function Adduser(e) {
                 <td>{i?.color}</td>
                 <td>{i?.price}</td>
                 <td>{i?.brand}</td>
-                {/* <td>{i?.car_file}</td> */}
                 <td>
-                  <button on>
-                    <img
-                      src={`http://192.168.1.8:3001/file/${i.image}`}
-                      className="img-fluid"
-                      alt="profile-image"
-                      height="150px"
-                      width="150px"
-                      // onClick={setIsModalOpen(true)}
-                    />
-                  </button>
+                  <img
+                    src={`http://192.168.1.5:8001/file/${i.image}`}
+                    className="img-fluid"
+                    alt="profile-image"
+                    height="150px"
+                    width="150px"
+                    onClick={() => {
+                      setIsModalOpen(true);
+                      selectUser(i);
+                      setIsImageChanging(true);
+                      setButtonTxt("update image");
+                    }}
+                  />
                 </td>
-                {/* <img src={file} /> */}
                 <td>
                   <button
                     className="btn btn-primary"
@@ -215,6 +221,8 @@ export default function Adduser(e) {
                       setButtonTxt("update cars");
                       setIsModalOpen(true);
                       selectUser(i);
+                      setIsImageChanging(false)
+                      // console.log(IsImageChanging);
                     }}
                   >
                     EDIT
@@ -244,7 +252,7 @@ export default function Adduser(e) {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         center
-        // animationDuration={300}
+        animationDuration={300}
         closeOnEsc={false}
         closeOnOverlayClick={false}
         styles={{
@@ -255,51 +263,55 @@ export default function Adduser(e) {
         }}
       >
         <div>
-          <tr>
-            <input
-              type="text"
-              name="name"
-              value={carData.name}
-              placeholder="CAR NAME"
-              onChange={handleChange}
-              className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-            />
-          </tr>
-          <tr>
-            <input
-              type="text"
-              name="color"
-              value={carData.color}
-              placeholder="Color"
-              onChange={handleChange}
-              className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-            />
-          </tr>
-          <tr>
-            <input
-              name="price"
-              type="text"
-              value={carData.price}
-              placeholder="CAR Price"
-              onChange={handleChange}
-              className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-            />
-          </tr>
-          <tr>
-            <input
-              name="brand"
-              type="text"
-              value={carData.brand}
-              placeholder="CAR Brand"
-              onChange={handleChange}
-              className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-            />
-          </tr>
+          {IsImageChanging ? null : (
+            <>
+              <tr>
+                <input
+                  type="text"
+                  name="color"
+                  value={carData.name}
+                  placeholder="Color"
+                  onChange={handleChange}
+                  className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
+                />
+              </tr>
+              <tr>
+                <input
+                  type="text"
+                  name="color"
+                  value={carData.color}
+                  placeholder="Color"
+                  onChange={handleChange}
+                  className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
+                />
+              </tr>
+              <tr>
+                <input
+                  name="price"
+                  type="text"
+                  value={carData.price}
+                  placeholder="CAR Price"
+                  onChange={handleChange}
+                  className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
+                />
+              </tr>
+              <tr>
+                <input
+                  name="brand"
+                  type="text"
+                  value={carData.brand}
+                  placeholder="CAR Brand"
+                  onChange={handleChange}
+                  className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
+                />
+              </tr>
+            </>
+          )}
+
           <tr>
             <td>
               <input name="file" type="file" onChange={(e) => imageChange(e)} />
-
-              {!selectedImage || selectedImage === "" ? (
+              {!selectedImage ? (
                 <div style={styles.preview}>
                   <img src={imagUrl} style={styles.image} alt="Thumb" />
                 </div>
