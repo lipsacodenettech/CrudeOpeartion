@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-responsive-modal/styles.css";
-import ImageUploading from 'react-images-uploading';
+import ImageUploading from "react-images-uploading";
 import { Modal } from "react-responsive-modal";
 import {
   useDeleteCarMutation,
@@ -16,7 +16,7 @@ import {
   useLazyGetAllCarQuery,
   useUpdateCarMutation,
 } from "./services/api";
-// import { Card } from "react-bootstrap";
+import swal from "sweetalert";
 
 // Just some styles
 const styles = {
@@ -59,11 +59,7 @@ export default function Adduser(e) {
     price: null,
     car_file: null,
   });
- const onChange = (imageList, addUpdateIndex) => {
-    // data for submit
-    console.log(imageList, addUpdateIndex);
-    setImages(imageList);
-  };
+
   // This function will be triggered when the "Remove This Image" button is clicked
   const removeSelectedImage = () => {
     setSelectedImage();
@@ -78,6 +74,16 @@ export default function Adduser(e) {
       });
     }
   };
+  function HandelPopUpOpen() {
+    setIsModalOpen(true);
+  }
+  function HandelPopUpClose() {
+    setIsModalOpen(false);
+    console.log(carData, "close");
+    setCarData(null);
+    setSelectedImage("");
+    setImgUrl("");
+  }
   const handleChange = (e) => {
     setCarData({
       ...carData,
@@ -96,11 +102,16 @@ export default function Adduser(e) {
       console.log(result.data);
     }
   }, [isSuccess, isFetching]);
-  const [delteCars] = useDeleteCarMutation();
+  const [delteCars, deleteCarsResult] = useDeleteCarMutation();
   const del = (id) => {
-    delteCars(id);
-    getCars({});
+    SweetAlertdel(id);
   };
+  const {
+    isSuccess: isdeSuccess,
+    isFetching: isdeFetching,
+    isError: isderError,
+    error: deError,
+  } = deleteCarsResult;
   function selectUser(data) {
     setCarData(data);
     setImgUrl(`${process.env.REACT_APP_PUBLIC_URL}/file/${data.image}`);
@@ -115,20 +126,22 @@ export default function Adduser(e) {
     isError: isuprError,
     error: upError,
   } = Updateresult;
-  var formdata = new FormData();
-  formdata.append("car_file", carData.car_file);
-  formdata.append("name", carData.name);
-  formdata.append("price", carData.price);
-  formdata.append("brand", carData.brand);
-  formdata.append("color", carData.color);
 
-  const update = {
-    formdata,
-    SelectedId,
-  };
   const updateUser = () => {
+    var formdata = new FormData();
+    formdata.append("car_file", carData.car_file);
+    formdata.append("name", carData.name);
+    formdata.append("price", carData.price);
+    formdata.append("brand", carData.brand);
+    formdata.append("color", carData.color);
+    const update = {
+      formdata,
+      SelectedId,
+    };
     UpdateCar(update);
-    console.log(update, "update");
+    // UpdateCar(update);
+    SweetAlertUp(update);
+    // console.log(update, "update");
   };
   useEffect(() => {
     if (isupSuccess && !isupFetching) {
@@ -150,14 +163,65 @@ export default function Adduser(e) {
     formdata.append("price", carData.price);
     formdata.append("brand", carData.brand);
     formdata.append("color", carData.color);
+    SweetAlertAdd();
     InsertNewCar(formdata);
   }
+  function AddNew() {
+    setButtonTxt("Add new");
+    HandelPopUpOpen();
+    setIsImageChanging(false);
+  }
   useEffect(() => {
-    if ((isCarSuccess && !isCarFetching) || (isupSuccess && isupFetching)) {
+    if (
+      (isCarSuccess && !isCarFetching) ||
+      (isupSuccess && isupFetching) ||
+      (isdeSuccess && isdeFetching)
+    ) {
       getCars({});
     }
-  }, [isCarSuccess, isCarFetching, isupSuccess, isupFetching]);
-
+  }, [
+    isCarSuccess,
+    isCarFetching,
+    isupSuccess,
+    isupFetching,
+    isdeSuccess,
+    isdeFetching,
+  ]);
+  function SweetAlertdel(id) {
+    swal({
+      title: "Are you sure?",
+      text: "Once deleted, you will not be able to recover this record !",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        delteCars(id);
+        swal(" record has been deleted!", {
+          icon: "success",
+        });
+      } else {
+        swal("Your record is safe!");
+      }
+    });
+  }
+  function SweetAlertUp() {
+    swal({
+      title: "Good job!",
+      text: "record is updated successfully!",
+      icon: "success",
+      button: "Okay!",
+    });
+  }
+  function  SweetAlertAdd() {
+    swal({
+      title: "Good job!",
+      text: "Your record is Added successfully!",
+      icon: "success",
+      button: "Okay!",
+    });
+      
+  }
   return (
     <div>
       Adduser page <br />
@@ -165,17 +229,8 @@ export default function Adduser(e) {
       <button
         className="btn btn-primary ml-[80%]"
         onClick={() => {
-          setButtonTxt("Add new");
-          setIsModalOpen(true);
-          setSelectedImage("");
-          setIsImageChanging(false);
-          carData.name = "";
-          carData.color = "";
-          carData.price = "";
-          carData.brand = "";
-          carData.car_file = "";
-        }}
-      >
+          AddNew();
+        }}>
         Add New cars
       </button>
       <form action=""></form>
@@ -201,13 +256,13 @@ export default function Adduser(e) {
                 <td>{i?.brand}</td>
                 <td>
                   <img
-                    src={`http://192.168.1.5:8001/file/${i.image}`}
+                    src={`http://192.168.1.7:8001/file/${i.image}`}
                     className="img-fluid"
                     alt="profile-image"
                     height="150px"
                     width="150px"
                     onClick={() => {
-                      setIsModalOpen(true);
+                      HandelPopUpOpen();
                       selectUser(i);
                       setIsImageChanging(true);
                       setButtonTxt("update image");
@@ -219,9 +274,9 @@ export default function Adduser(e) {
                     className="btn btn-primary"
                     onClick={() => {
                       setButtonTxt("update cars");
-                      setIsModalOpen(true);
+                      HandelPopUpOpen();
                       selectUser(i);
-                      setIsImageChanging(false)
+                      setIsImageChanging(false);
                       // console.log(IsImageChanging);
                     }}
                   >
@@ -250,7 +305,7 @@ export default function Adduser(e) {
           closeIcon: "color",
         }}
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => HandelPopUpClose()}
         center
         animationDuration={300}
         closeOnEsc={false}
@@ -268,9 +323,9 @@ export default function Adduser(e) {
               <tr>
                 <input
                   type="text"
-                  name="color"
-                  value={carData.name}
-                  placeholder="Color"
+                  name="name"
+                  value={carData?.name}
+                  placeholder="name"
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
@@ -279,7 +334,7 @@ export default function Adduser(e) {
                 <input
                   type="text"
                   name="color"
-                  value={carData.color}
+                  value={carData?.color}
                   placeholder="Color"
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
@@ -289,7 +344,7 @@ export default function Adduser(e) {
                 <input
                   name="price"
                   type="text"
-                  value={carData.price}
+                  value={carData?.price}
                   placeholder="CAR Price"
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
@@ -299,7 +354,7 @@ export default function Adduser(e) {
                 <input
                   name="brand"
                   type="text"
-                  value={carData.brand}
+                  value={carData?.brand}
                   placeholder="CAR Brand"
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
@@ -332,7 +387,7 @@ export default function Adduser(e) {
           <tr>
             <button
               onClick={() => {
-                setIsModalOpen(false);
+                HandelPopUpClose();
                 {
                   ButtonTxt === "Add new"
                     ? AddNewCar()

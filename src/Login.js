@@ -29,7 +29,7 @@ export default function Login() {
       onSubmit: (values, action) => {
          axios
           .post(
-            "http://192.168.1.5:8001/login",
+            "http://192.168.1.7:8001/login",
             {
               email: values.email,
               password: values.password,
