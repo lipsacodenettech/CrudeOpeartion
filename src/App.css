@@ -37,12 +37,8 @@
   }
 }
 .customModal {
-  background: #000000;
+  background: #ffffff;
   /* max-width: 500px; */
   padding: 100px;
   width: fit-content;
-}
-.color
-{
-  background-color: aliceblue;
 }

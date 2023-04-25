@@ -1,12 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 /* eslint-disable eqeqeq */
 // import React, { useState } from "react";
-import axios from "axios";
 import { useFormik } from "formik";
 import { signUpSchema } from "./schemas";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useEffect } from "react";
-
+import { useLoginUserMutation } from "./services/api";
+import { useState } from "react";
+import './all.min.css'
 export default function Login() {
+  const [isUpdating, setIsUpdating] = useState(false);
   const navigate = useNavigate();
   const initialValues = {
     email: "",
@@ -14,36 +19,41 @@ export default function Login() {
   };
   useEffect(() => {
     let token = localStorage.getItem("token");
-    // console.log(token);
     if (token) {
-      navigate("/dashboard");
+      navigate("/adduser");
     }
-  // eslint-disable-next-line no-undef, react-hooks/exhaustive-deps
   }, []);
+  const [Login, Loginresult] = useLoginUserMutation();
+  const { isSuccess, isFetching, isError, error } = Loginresult;
+  useEffect(() => {
+    if (isSuccess && !isFetching) {
+      setIsUpdating(false);
+      console.log(Loginresult);
+      localStorage.setItem("email", values.email);
+      localStorage.setItem("token", Loginresult.data.data.token);
+      let token = localStorage.getItem("token");
+      if (token) {
+        navigate("/adduser");
+      }
+      console.log(Loginresult.data.data.token);
+    }
+  }, [isSuccess, isFetching]);
   const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
     useFormik({
       initialValues,
       validationSchema: signUpSchema,
       onSubmit: (values, action) => {
-        axios
-          .post("http://192.168.1.6:8001/login", {
-            email: values.email,
-            password: values.password,
-          })
-          .then(function (response) {
-            if (response.status == "200") {
-              localStorage.setItem("email", values.email);
-              localStorage.setItem("token", response.data.data.token);
-              console.log(response.data.data.token);
-              navigate("/dashboard");
-            }
-          });
+        setIsUpdating(true)
+        Login({
+          email: values?.email,
+          password: values?.password,
+        });
       },
     });
   return (
     <div>
       <div className=" text-white bg-black min-h-screen">
-        <div className="grid md:grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 grid-rows-1 py-2 gap-10">
+        <div className="grid md:grid-cols-1 sm:grid-cols-in sign in1 lg:grid-cols-2 grid-rows-1 py-2 gap-10">
           <div className="px-5 lg:px-8 md:mx-auto lg:mx-0 sm:mx-auto xs:mx-auto">
             <img
               src={require("./img/logo.png")}
@@ -60,35 +70,35 @@ export default function Login() {
               <input
                 type="email"
                 className=" h-10 mt-[2%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-                placeholder="Enter your email"
+                placeholder={
+                  errors.email && touched.email
+                    ? errors.email
+                    : "Enter your email"
+                }
                 value={values.email}
-                // onChange={(e) => setEmail(e.target.value)}
                 onChange={handleChange}
                 autoComplete="off"
                 name="email"
                 id="email"
                 onBlur={handleBlur}
               />
-              {errors.email && touched.email ? (
-                <p className="form-error">{errors.email}</p>
-              ) : null}
+
               <input
                 type="password"
                 className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-                placeholder="Enter your password"
+                placeholder={
+                  errors.password && touched.password
+                    ? errors.password
+                    : "Enter your password"
+                }
                 value={values.password}
-                // type="password"
                 autoComplete="off"
                 name="password"
                 id="password"
-                // placeholder="Password"
-                // value={values.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
-              {errors.password && touched.password ? (
-                <p className="form-error">{errors.password}</p>
-              ) : null}
+
               <div class="form-check form-switch">
                 <input
                   class="form-check-input bg-transparent border-white p-[12px] px-[20px] mt-4"
@@ -103,18 +113,23 @@ export default function Login() {
               <button
                 type="submit"
                 onClick={handleSubmit}
-                className="w-full px-16 py-3.5 mt-6 mb-4 font-bold leading-normal text-center text-white align-middle transition-all bg-cyan-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-sm ease-in tracking-tight-rem shadow-md bg-150 bg-x-25 "
+                className="w-full px-16 py-3.5 mt-6 mb-4 font-bold leading-normal text-center text-white align-middle transition-all bg-cyan-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-[17px] ease-in tracking-tight-rem shadow-md bg-150 bg-x-25 "
               >
-                Sign in{" "}
+                {isUpdating ? (
+                  <i className="fa fa-spinner animate-spin mr-2"></i>
+                ) : (
+                  <i class="fa-solid fa-arrow-right-to-bracket mr-2"></i>
+                )}
+                Signin
               </button>
               <div className=" text-center capitalize text-slate-600 text-sm font-bold tracking-wide">
                 don't have an account !
-                <a
-                  href="/Sign_up"
+                <Link
+                  to="/Sign_up"
                   className="capitalize text-cyan-600 text-xs text-right font-bold"
                 >
                   sign up
-                </a>
+                </Link>
               </div>
             </form>
             {/* <div className="h-1 w-1  before:mt-[50px]   before:content-[''] before:w-[60px] before:h-[1px] before:bg-slate-300 before:absolute before:ml-[277px] "></div> */}

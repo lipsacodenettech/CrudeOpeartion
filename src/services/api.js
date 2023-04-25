@@ -1,48 +1,55 @@
 /* eslint-disable no-labels */
 /* eslint-disable no-unused-expressions */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-let headers = {};
-if (localStorage.token) {
-  headers = { Authorization: `Bearer ` + localStorage.token };
-  console.log("token from api ", headers);
-}
 
+const baseQuery = fetchBaseQuery({
+  baseUrl: process.env.REACT_APP_BASE_URL,
+  prepareHeaders: (headers) => {
+    let token = localStorage.getItem("token");
+    headers.set("Authorization", `Bearer ${token}`);
+    return headers;
+  },
+});
 export const carApi = createApi({
   reducerPath: "carApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_BASE_URL,
-    headers: headers,
-    // prepareHeaders: (headers) => {
-    //   headers.set(
-    //     "Authorization",
-    //     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxpcHNhQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMTIzNDUiLCJpYXQiOjE2ODExODg3MTR9.UjwNxXB8fz6pbf1LbZX27oNmxzngT56AU_w4B4qY-Vk"
-    //   );
-    //   return headers;
-    // },
-  }),
+  baseQuery: baseQuery,
   endpoints: (builder) => ({
+    loginUser: builder.mutation({
+      query: (data) => ({
+        url: `login`,
+        method: "post",
+        body:data
+      }),
+    }),
+    registerUser: builder.mutation({
+      query: (data) => ({
+        url: `register`,
+        method: "post",
+        body:data
+      }),
+    }),
     getAllCar: builder.query({
       query: () => ({
-        url: `getdata`,
+        url: `cars/getdata`,
         method: "GET",
       }),
     }),
     DeleteCar: builder.mutation({
       query: (id) => ({
-        url: `deletedata/${id}`,
+        url: `cars/deletedata/${id}`,
         method: "DELETE",
       }),
     }),
     InsertNewCar: builder.mutation({
       query: (newcar) => ({
-        url: "insert",
+        url: "cars/insert",
         method: "POST",
         body: newcar,
       }),
     }),
     UpdateCar: builder.mutation({
       query: (update) => ({
-        url: `update/${update.SelectedId}`,
+        url: `cars/update/${update.SelectedId}`,
         method: "PUT",
         body: update.formdata,
       }),
@@ -50,6 +57,8 @@ export const carApi = createApi({
   }),
 });
 export const {
+  useLoginUserMutation,
+  useRegisterUserMutation,
   useLazyGetAllCarQuery,
   useDeleteCarMutation,
   useInsertNewCarMutation,

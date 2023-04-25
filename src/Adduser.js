@@ -51,6 +51,7 @@ export default function Adduser() {
   const [Result, setResult] = useState([]);
   const [imagUrl, setImgUrl] = useState("");
   const [ButtonTxt, setButtonTxt] = useState("update cars");
+  const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -76,12 +77,12 @@ export default function Adduser() {
     validationSchema: Addschemas,
     onSubmit: (values, action) => {
       var formdata = new FormData();
-      console.log(values, "*-*--");
       formdata.append("car_file", values.car_file);
       formdata.append("name", values.name);
       formdata.append("price", values.price);
       formdata.append("brand", values.brand);
       formdata.append("color", values.color);
+      setIsUpdating(true);
       InsertNewCar(formdata);
     },
     handleChange(e) {
@@ -109,27 +110,31 @@ export default function Adduser() {
     setImgUrl("");
   }
 
+  // log out
+  const Logout = () => {
+    window.localStorage.clear();
+    navigate("/");
+  };
+
   // getting all data
   const [getCars, result] = useLazyGetAllCarQuery();
   const { isSuccess, isFetching, isError, error } = result;
   useEffect(() => {
-    getCars();
-  },[]);
+    getCars({});
+  }, []);
   useEffect(() => {
     if (isSuccess && !isFetching) {
       setResult(result?.data.length > 0 ? result.data : []);
       console.log(result.data);
-      // if (result.data.message === "User Unauthorized") {
-      //   // window.localStorage.clear();
-      //   // navigate("/");
-      // }
     }
   }, [isSuccess, isFetching]);
 
   // for deleting data
   const [delteCars, deleteCarsResult] = useDeleteCarMutation();
   const del = (id) => {
+    setIsUpdating(true);
     SweetAlertdel(id);
+    setSelectedID(id);
   };
   const {
     isSuccess: isdeSuccess,
@@ -145,8 +150,8 @@ export default function Adduser() {
     setFieldValue("brand", data.brand);
     setFieldValue("price", data.price);
     setFieldValue("car_file", data.car_file);
-    console.log(data.image);
-    setImgUrl(`${process.env.REACT_APP_PUBLIC_URL}/file/${data.image}`);
+    setImgUrl(`${process.env.REACT_APP_BASE_URL}file/${data.image}`);
+    console.log(imagUrl);
     setSelectedID(data._id);
     setSelectedImage("");
   }
@@ -161,7 +166,6 @@ export default function Adduser() {
   } = Updateresult;
 
   const updateUser = (e) => {
-    // console.log(selectedImage);/
     var formdata = new FormData();
     if (selectedImage) {
       formdata.append("car_file", selectedImage);
@@ -175,6 +179,7 @@ export default function Adduser() {
       formdata,
       SelectedId,
     };
+    setIsUpdating(true);
     UpdateCar(update);
   };
 
@@ -206,6 +211,7 @@ export default function Adduser() {
       (isupSuccess && !isupFetching) ||
       (isdeSuccess && !isdeFetching)
     ) {
+      setIsUpdating(false);
       getCars({});
     }
   }, [
@@ -216,6 +222,11 @@ export default function Adduser() {
     isdeSuccess,
     isdeFetching,
   ]);
+  useEffect(() => {
+    if (isupSuccess || isCarSuccess) {
+      HandelPopUpClose();
+    }
+  }, [isupSuccess, isCarSuccess]);
 
   // when car is updated successfully alert is called
   useEffect(() => {
@@ -275,6 +286,12 @@ export default function Adduser() {
       Adduser page <br />
       <Link to="/dashboard">DASHBOARD </Link>
       <button
+        onClick={Logout}
+        className="w-[10%]  py-2  mt-6 mb-4 font-bold leading-normal text-center text-white align-middle transition-all bg-cyan-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-sm ease-in tracking-tight-rem shadow-md bg-150 bg-x-25 "
+      >
+        Logout
+      </button>
+      <button
         className="btn btn-primary ml-[80%]"
         onClick={() => {
           AddNew();
@@ -295,6 +312,7 @@ export default function Adduser() {
             <th scope="col">delete</th>
           </tr>
         </thead>
+
         <tbody>
           {Result?.map((i) => {
             return (
@@ -326,7 +344,6 @@ export default function Adduser() {
                       HandelPopUpOpen();
                       selectUser(i);
                       setIsImageChanging(false);
-                      // console.log(IsImageChanging);
                     }}
                   >
                     EDIT
@@ -340,6 +357,11 @@ export default function Adduser() {
                     }}
                     className="btn btn-primary"
                   >
+                    {isUpdating && SelectedId === i._id ? (
+                      <i class="fa fa-spinner fa-spin text-[20px] text-center mr-2"></i>
+                    ) : (
+                      <i class="fa-solid fa-trash mr-2"></i>
+                    )}
                     DELETE
                   </button>
                 </td>
@@ -374,42 +396,39 @@ export default function Adduser() {
                   type="text"
                   name="name"
                   value={values?.name}
-                  placeholder="name"
+                  placeholder={
+                    errors.name && touched.name ? errors.name : "Enter name"
+                  }
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
-                {errors.name && touched.name ? (
-                  <p className="form-error">{errors.name}</p>
-                ) : null}
               </tr>
               <tr>
                 <input
                   type="text"
                   name="color"
                   value={values?.color}
-                  placeholder="Color"
+                  placeholder={
+                    errors.color && touched.color ? errors.color : "Enter color"
+                  }
                   onBlur={handleBlur}
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
-                {errors.color && touched.color ? (
-                  <p className="form-error">{errors.color}</p>
-                ) : null}
               </tr>
               <tr>
                 <input
                   name="price"
                   type="text"
                   value={values?.price}
-                  placeholder="CAR Price"
+                  placeholder={
+                    errors.price && touched.price ? errors.price : "Enter price"
+                  }
                   onBlur={handleBlur}
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
-                {errors.price && touched.price ? (
-                  <p className="form-error">{errors.price}</p>
-                ) : null}
               </tr>
               <tr>
                 <input
@@ -417,13 +436,12 @@ export default function Adduser() {
                   type="text"
                   value={values?.brand}
                   onBlur={handleBlur}
-                  placeholder="CAR Brand"
+                  placeholder={
+                    errors.brand && touched.brand ? errors.brand : "Enter brand"
+                  }
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
-                {errors.brand && touched.brand ? (
-                  <p className="form-error">{errors.brand}</p>
-                ) : null}
               </tr>
             </>
           )}
@@ -459,7 +477,6 @@ export default function Adduser() {
           <tr>
             <button
               onClick={(e) => {
-                HandelPopUpClose();
                 {
                   ButtonTxt === "Add new"
                     ? handleSubmit()
@@ -468,6 +485,13 @@ export default function Adduser() {
               }}
               className="btn btn-primary mt-[5%]"
             >
+              {isUpdating ? (
+                <i class="fa fa-spinner fa-spin text-[20px] text-center mr-2"></i>
+              ) : ButtonTxt === "Add new" ? (
+                <i class="fa-sharp fa-solid fa-plus mr-2"></i>
+              ) : (
+                <i class="fa-regular fa-pen-to-square mr-2"></i>
+              )}
               {ButtonTxt}
             </button>
           </tr>
