@@ -5,10 +5,8 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-responsive-modal/styles.css";
-import ImageUploading from "react-images-uploading";
 import { Modal } from "react-responsive-modal";
 import {
   useDeleteCarMutation,
@@ -17,6 +15,10 @@ import {
   useUpdateCarMutation,
 } from "./services/api";
 import swal from "sweetalert";
+import { useFormik } from "formik";
+import { Addschemas } from "./schemas/Add";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Just some styles
 const styles = {
@@ -42,9 +44,7 @@ const styles = {
   },
 };
 
-export default function Adduser(e) {
-  const [images, setImages] = React.useState([]);
-  const maxNumber = 69;
+export default function Adduser() {
   const [SelectedId, setSelectedID] = useState();
   const [selectedImage, setSelectedImage] = useState();
   const [IsImageChanging, setIsImageChanging] = useState(false);
@@ -52,12 +52,44 @@ export default function Adduser(e) {
   const [imagUrl, setImgUrl] = useState("");
   const [ButtonTxt, setButtonTxt] = useState("update cars");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [carData, setCarData] = useState({
+  const navigate = useNavigate();
+
+  var initialValues = {
     name: null,
     color: null,
     brand: null,
     price: null,
     car_file: null,
+  };
+
+  // formik validations
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    setFieldValue,
+  } = useFormik({
+    initialValues,
+    validationSchema: Addschemas,
+    onSubmit: (values, action) => {
+      var formdata = new FormData();
+      console.log(values, "*-*--");
+      formdata.append("car_file", values.car_file);
+      formdata.append("name", values.name);
+      formdata.append("price", values.price);
+      formdata.append("brand", values.brand);
+      formdata.append("color", values.color);
+      InsertNewCar(formdata);
+    },
+    handleChange(e) {
+      initialValues({
+        ...initialValues,
+        [e.target.name]: e.target.value,
+      });
+    },
   });
 
   // This function will be triggered when the "Remove This Image" button is clicked
@@ -65,43 +97,36 @@ export default function Adduser(e) {
     setSelectedImage();
   };
 
-  const imageChange = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedImage(e.target.files[0]);
-      setCarData({
-        ...carData,
-        car_file: e.target.files[0],
-      });
-    }
-  };
+  // for open pop up
   function HandelPopUpOpen() {
     setIsModalOpen(true);
   }
+
+  //  for close pop up
   function HandelPopUpClose() {
     setIsModalOpen(false);
-    console.log(carData, "close");
-    setCarData(null);
     setSelectedImage("");
     setImgUrl("");
   }
-  const handleChange = (e) => {
-    setCarData({
-      ...carData,
-      [e.target.name]: e.target.value,
-    });
-  };
+
+  // getting all data
   const [getCars, result] = useLazyGetAllCarQuery();
   const { isSuccess, isFetching, isError, error } = result;
   useEffect(() => {
     getCars();
-  }, []);
-
+  },[]);
   useEffect(() => {
     if (isSuccess && !isFetching) {
       setResult(result?.data.length > 0 ? result.data : []);
       console.log(result.data);
+      // if (result.data.message === "User Unauthorized") {
+      //   // window.localStorage.clear();
+      //   // navigate("/");
+      // }
     }
   }, [isSuccess, isFetching]);
+
+  // for deleting data
   const [delteCars, deleteCarsResult] = useDeleteCarMutation();
   const del = (id) => {
     SweetAlertdel(id);
@@ -112,13 +137,21 @@ export default function Adduser(e) {
     isError: isderError,
     error: deError,
   } = deleteCarsResult;
+
+  // for selecting user on click of edit button
   function selectUser(data) {
-    setCarData(data);
+    setFieldValue("name", data.name);
+    setFieldValue("color", data.color);
+    setFieldValue("brand", data.brand);
+    setFieldValue("price", data.price);
+    setFieldValue("car_file", data.car_file);
+    console.log(data.image);
     setImgUrl(`${process.env.REACT_APP_PUBLIC_URL}/file/${data.image}`);
     setSelectedID(data._id);
     setSelectedImage("");
   }
 
+  // for updating user on click of update user
   const [UpdateCar, Updateresult] = useUpdateCarMutation();
   const {
     isSuccess: isupSuccess,
@@ -127,27 +160,25 @@ export default function Adduser(e) {
     error: upError,
   } = Updateresult;
 
-  const updateUser = () => {
+  const updateUser = (e) => {
+    // console.log(selectedImage);/
     var formdata = new FormData();
-    formdata.append("car_file", carData.car_file);
-    formdata.append("name", carData.name);
-    formdata.append("price", carData.price);
-    formdata.append("brand", carData.brand);
-    formdata.append("color", carData.color);
+    if (selectedImage) {
+      formdata.append("car_file", selectedImage);
+      console.log(selectedImage, "if call");
+    }
+    formdata.append("name", values.name);
+    formdata.append("price", values.price);
+    formdata.append("brand", values.brand);
+    formdata.append("color", values.color);
     const update = {
       formdata,
       SelectedId,
     };
     UpdateCar(update);
-    // UpdateCar(update);
-    SweetAlertUp(update);
-    // console.log(update, "update");
   };
-  useEffect(() => {
-    if (isupSuccess && !isupFetching) {
-      getCars({});
-    }
-  }, [isupSuccess, isupFetching]);
+
+  // for inserting new car
   const [InsertNewCar, CarResult] = useInsertNewCarMutation();
   const {
     isSuccess: isCarSuccess,
@@ -156,26 +187,24 @@ export default function Adduser(e) {
     error: carError,
   } = CarResult;
 
-  function AddNewCar() {
-    var formdata = new FormData();
-    formdata.append("car_file", carData.car_file);
-    formdata.append("name", carData.name);
-    formdata.append("price", carData.price);
-    formdata.append("brand", carData.brand);
-    formdata.append("color", carData.color);
-    SweetAlertAdd();
-    InsertNewCar(formdata);
-  }
+  // for setting null value when model is open on click of Add new car button
   function AddNew() {
     setButtonTxt("Add new");
+    setFieldValue("name", null);
+    setFieldValue("color", null);
+    setFieldValue("brand", null);
+    setFieldValue("price", null);
+    setFieldValue("car_file", null);
     HandelPopUpOpen();
     setIsImageChanging(false);
   }
+
+  // common use effect for  getting all data
   useEffect(() => {
     if (
       (isCarSuccess && !isCarFetching) ||
-      (isupSuccess && isupFetching) ||
-      (isdeSuccess && isdeFetching)
+      (isupSuccess && !isupFetching) ||
+      (isdeSuccess && !isdeFetching)
     ) {
       getCars({});
     }
@@ -187,6 +216,22 @@ export default function Adduser(e) {
     isdeSuccess,
     isdeFetching,
   ]);
+
+  // when car is updated successfully alert is called
+  useEffect(() => {
+    if (isupSuccess && !isupFetching) {
+      SweetAlertUp();
+    }
+  }, [isupSuccess, isupFetching]);
+
+  // when car is inserted successfully alert is called
+  useEffect(() => {
+    if (isCarSuccess && !isCarFetching) {
+      SweetAlertAdd();
+    }
+  }, [isCarSuccess, isCarFetching]);
+
+  // when car is deleted successfully alert is called
   function SweetAlertdel(id) {
     swal({
       title: "Are you sure?",
@@ -205,6 +250,8 @@ export default function Adduser(e) {
       }
     });
   }
+
+  // update alert
   function SweetAlertUp() {
     swal({
       title: "Good job!",
@@ -213,24 +260,26 @@ export default function Adduser(e) {
       button: "Okay!",
     });
   }
-  function  SweetAlertAdd() {
+
+  // insert new carr alert
+  function SweetAlertAdd() {
     swal({
       title: "Good job!",
       text: "Your record is Added successfully!",
       icon: "success",
       button: "Okay!",
     });
-      
   }
   return (
     <div>
       Adduser page <br />
-      <a href="/Dashboard">Dashboard</a>
+      <Link to="/dashboard">DASHBOARD </Link>
       <button
         className="btn btn-primary ml-[80%]"
         onClick={() => {
           AddNew();
-        }}>
+        }}
+      >
         Add New cars
       </button>
       <form action=""></form>
@@ -256,7 +305,7 @@ export default function Adduser(e) {
                 <td>{i?.brand}</td>
                 <td>
                   <img
-                    src={`http://192.168.1.7:8001/file/${i.image}`}
+                    src={`http://192.168.1.6:8001/file/${i.image}`}
                     className="img-fluid"
                     alt="profile-image"
                     height="150px"
@@ -324,48 +373,71 @@ export default function Adduser(e) {
                 <input
                   type="text"
                   name="name"
-                  value={carData?.name}
+                  value={values?.name}
                   placeholder="name"
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
+                {errors.name && touched.name ? (
+                  <p className="form-error">{errors.name}</p>
+                ) : null}
               </tr>
               <tr>
                 <input
                   type="text"
                   name="color"
-                  value={carData?.color}
+                  value={values?.color}
                   placeholder="Color"
+                  onBlur={handleBlur}
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
+                {errors.color && touched.color ? (
+                  <p className="form-error">{errors.color}</p>
+                ) : null}
               </tr>
               <tr>
                 <input
                   name="price"
                   type="text"
-                  value={carData?.price}
+                  value={values?.price}
                   placeholder="CAR Price"
+                  onBlur={handleBlur}
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
+                {errors.price && touched.price ? (
+                  <p className="form-error">{errors.price}</p>
+                ) : null}
               </tr>
               <tr>
                 <input
                   name="brand"
                   type="text"
-                  value={carData?.brand}
+                  value={values?.brand}
+                  onBlur={handleBlur}
                   placeholder="CAR Brand"
                   onChange={handleChange}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
+                {errors.brand && touched.brand ? (
+                  <p className="form-error">{errors.brand}</p>
+                ) : null}
               </tr>
             </>
           )}
 
           <tr>
             <td>
-              <input name="file" type="file" onChange={(e) => imageChange(e)} />
+              <input
+                name="car_file"
+                type="file"
+                onChange={(e) => {
+                  setFieldValue("car_file", e.currentTarget.files[0]);
+                  setSelectedImage(e.currentTarget.files[0]);
+                }}
+              />
               {!selectedImage ? (
                 <div style={styles.preview}>
                   <img src={imagUrl} style={styles.image} alt="Thumb" />
@@ -386,12 +458,12 @@ export default function Adduser(e) {
           </tr>
           <tr>
             <button
-              onClick={() => {
+              onClick={(e) => {
                 HandelPopUpClose();
                 {
                   ButtonTxt === "Add new"
-                    ? AddNewCar()
-                    : updateUser(SelectedId);
+                    ? handleSubmit()
+                    : updateUser(SelectedId, e);
                 }
               }}
               className="btn btn-primary mt-[5%]"

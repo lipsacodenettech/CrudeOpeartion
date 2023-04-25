@@ -33,7 +33,7 @@ export default function Signup() {
           return;
         }
         axios
-          .post("http://192.168.1.7:8001/register", {
+          .post("http://192.168.1.6:8001/register", {
             name: values.name,
             email: values.email,
             password: values.password,
@@ -58,13 +58,6 @@ export default function Signup() {
           });
       },
     });
-
-  console.log(
-    "🚀 ~ file: Registration.jsx ~ line 25 ~ Registration ~ errors",
-    errors
-  );
-  const registerclick = () => {};
-
   return (
     <div>
       <div className=" text-white bg-black min-h-screen">

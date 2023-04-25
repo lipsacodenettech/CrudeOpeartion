@@ -1,16 +1,17 @@
 /* eslint-disable no-labels */
 /* eslint-disable no-unused-expressions */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-let headers = {}
+let headers = {};
 if (localStorage.token) {
-    headers = { 'Authorization': `bearer ` +  (localStorage.token) }
-    console.log("token from api ",headers);
+  headers = { Authorization: `Bearer ` + localStorage.token };
+  console.log("token from api ", headers);
 }
+
 export const carApi = createApi({
   reducerPath: "carApi",
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.REACT_APP_BASE_URL,
-     headers: headers 
+    headers: headers,
     // prepareHeaders: (headers) => {
     //   headers.set(
     //     "Authorization",

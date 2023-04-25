@@ -7,54 +7,18 @@ import Login from "./Login";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Routes, Route } from "react-router-dom";
 import Signup from "./Signup";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   return (
     <div>
       <Routes>
-        <Route
-          path="/"
-          element={
-            window.localStorage.getItem("email") === null ? (
-              <Login />
-            ) : (
-              <Adduser />
-            )
-          }
-        />
-        {/* <Route path="/Dashboard" element={<Dashboard/>}/> */}
-        {/* <Route path="/" element={<Login/>}/> */}
-        <Route
-          path="/Dashboard"
-          element={
-            window.localStorage.getItem("email") !== null ? (
-              <Dashboard />
-            ) : (
-              <Login />
-            )
-          }
-        />
-        <Route
-          path="/adduser"
-          element={
-            window.localStorage.getItem("email") !== null ? (
-              <Adduser />
-            ) : (
-              <Login />
-            )
-          }
-        />
-        <Route
-          path="/sign_up"
-          element={
-            window.localStorage.getItem("email") !== null ? (
-              <Adduser />
-            ) : (
-              <Signup />
-            )
-          }
-        />
-        {/* <Route path="/sign_up" element={<Signup />} /> */}
+        <Route path="/" element={<Login />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/adduser" element={<Adduser />} />
+          <Route path="/sign_up" element={<Signup />} />
+          <Route path="/Dashboard" element={<Dashboard />} />
+        </Route>
       </Routes>
     </div>
   );
