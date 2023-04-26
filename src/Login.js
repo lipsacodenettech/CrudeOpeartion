@@ -28,14 +28,14 @@ export default function Login() {
   useEffect(() => {
     if (isSuccess && !isFetching) {
       setIsUpdating(false);
-      console.log(Loginresult);
+      // console.log(Loginresult);
       localStorage.setItem("email", values.email);
       localStorage.setItem("token", Loginresult.data.data.token);
       let token = localStorage.getItem("token");
       if (token) {
         navigate("/adduser");
       }
-      console.log(Loginresult.data.data.token);
+      // console.log(Loginresult.data.data.token);
     }
   }, [isSuccess, isFetching]);
   const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
@@ -43,11 +43,11 @@ export default function Login() {
       initialValues,
       validationSchema: signUpSchema,
       onSubmit: (values, action) => {
-        setIsUpdating(true)
         Login({
           email: values?.email,
           password: values?.password,
         });
+        setIsUpdating(true)
       },
     });
   return (
@@ -114,6 +114,10 @@ export default function Login() {
                 type="submit"
                 onClick={handleSubmit}
                 className="w-full px-16 py-3.5 mt-6 mb-4 font-bold leading-normal text-center text-white align-middle transition-all bg-cyan-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-[17px] ease-in tracking-tight-rem shadow-md bg-150 bg-x-25 "
+                disabled={
+                  !values.password ||
+                  !values.email 
+                }
               >
                 {isUpdating ? (
                   <i className="fa fa-spinner animate-spin mr-2"></i>

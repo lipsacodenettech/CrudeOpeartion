@@ -125,14 +125,17 @@ export default function Adduser() {
   useEffect(() => {
     if (isSuccess && !isFetching) {
       setResult(result?.data.length > 0 ? result.data : []);
-      console.log(result.data);
+      // console.log(result.data);
+      setIsUpdating(false);
+    }
+    if (isFetching) {
+      setIsUpdating(true);
     }
   }, [isSuccess, isFetching]);
 
   // for deleting data
   const [delteCars, deleteCarsResult] = useDeleteCarMutation();
   const del = (id) => {
-    setIsUpdating(true);
     SweetAlertdel(id);
     setSelectedID(id);
   };
@@ -150,8 +153,8 @@ export default function Adduser() {
     setFieldValue("brand", data.brand);
     setFieldValue("price", data.price);
     setFieldValue("car_file", data.car_file);
-    setImgUrl(`${process.env.REACT_APP_BASE_URL}file/${data.image}`);
-    console.log(imagUrl);
+    setImgUrl(`${process.env.REACT_APP_BASE_URL}/file/${data.image}`);
+    // console.log(imagUrl);
     setSelectedID(data._id);
     setSelectedImage("");
   }
@@ -169,7 +172,7 @@ export default function Adduser() {
     var formdata = new FormData();
     if (selectedImage) {
       formdata.append("car_file", selectedImage);
-      console.log(selectedImage, "if call");
+      // console.log(selectedImage, "if call");
     }
     formdata.append("name", values.name);
     formdata.append("price", values.price);
@@ -211,8 +214,8 @@ export default function Adduser() {
       (isupSuccess && !isupFetching) ||
       (isdeSuccess && !isdeFetching)
     ) {
-      setIsUpdating(false);
       getCars({});
+      setIsUpdating(false);
     }
   }, [
     isCarSuccess,
@@ -249,15 +252,18 @@ export default function Adduser() {
       text: "Once deleted, you will not be able to recover this record !",
       icon: "warning",
       buttons: true,
+
       dangerMode: true,
     }).then((willDelete) => {
       if (willDelete) {
+        setIsUpdating(true);
         delteCars(id);
-        swal(" record has been deleted!", {
-          icon: "success",
-        });
+        // swal(" record has been deleted!", {
+        //   icon: "success",
+        // });
       } else {
         swal("Your record is safe!");
+        setIsUpdating(false);
       }
     });
   }
@@ -312,63 +318,62 @@ export default function Adduser() {
             <th scope="col">delete</th>
           </tr>
         </thead>
-
-        <tbody>
-          {Result?.map((i) => {
-            return (
-              <tr>
-                <td> {i?.name}</td>
-                <td>{i?.color}</td>
-                <td>{i?.price}</td>
-                <td>{i?.brand}</td>
-                <td>
-                  <img
-                    src={`http://192.168.1.6:8001/file/${i.image}`}
-                    className="img-fluid"
-                    alt="profile-image"
-                    height="150px"
-                    width="150px"
-                    onClick={() => {
-                      HandelPopUpOpen();
-                      selectUser(i);
-                      setIsImageChanging(true);
-                      setButtonTxt("update image");
-                    }}
-                  />
-                </td>
-                <td>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => {
-                      setButtonTxt("update cars");
-                      HandelPopUpOpen();
-                      selectUser(i);
-                      setIsImageChanging(false);
-                    }}
-                  >
-                    EDIT
-                  </button>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      del(i._id);
-                    }}
-                    className="btn btn-primary"
-                  >
-                    {isUpdating && SelectedId === i._id ? (
-                      <i class="fa fa-spinner fa-spin text-[20px] text-center mr-2"></i>
-                    ) : (
+        {isUpdating ? (
+          <i class="fa fa-spinner fa-spin text-[100px] text-cyan-600 ml-[200%] mt-[50%]"></i>
+        ) : (
+          <tbody>
+            {Result?.map((i) => {
+              return (
+                <tr>
+                  <td> {i?.name}</td>
+                  <td>{i?.color}</td>
+                  <td>{i?.price}</td>
+                  <td>{i?.brand}</td>
+                  <td>
+                    <img
+                      src={`${process.env.REACT_APP_BASE_URL}/file/${i.image}`}
+                      className="img-fluid"
+                      alt="profile-image"
+                      height="150px"
+                      width="150px"
+                      onClick={() => {
+                        HandelPopUpOpen();
+                        selectUser(i);
+                        setIsImageChanging(true);
+                        setButtonTxt("update image");
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => {
+                        setButtonTxt("update cars");
+                        HandelPopUpOpen();
+                        selectUser(i);
+                        setIsImageChanging(false);
+                      }}
+                    >
+                      EDIT
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        del(i._id);
+                      }}
+                      className="btn btn-primary"
+                    >
                       <i class="fa-solid fa-trash mr-2"></i>
-                    )}
-                    DELETE
-                  </button>
-                </td>
-              </tr>
-            );
-          })}{" "}
-        </tbody>
+                      DELETE
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}{" "}
+          </tbody>
+        )}
       </table>
       <Modal
         classNames={{

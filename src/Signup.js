@@ -27,7 +27,7 @@ export default function Signup() {
   const { isSuccess, isFetching, isError, error } = RegisterResult;
   useEffect(() => {
     if (isSuccess && !isFetching) {
-      console.log(RegisterResult);
+      // console.log(RegisterResult);
       alert("success");
     }
   }, []);
