@@ -55,7 +55,7 @@ export default function Adduser() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  var initialValues = {
+  var initialValues = { 
     name: null,
     color: null,
     brand: null,
@@ -468,7 +468,6 @@ export default function Adduser() {
               </tr>
             </>
           )}
-
           <tr>
             <td>
               <input
