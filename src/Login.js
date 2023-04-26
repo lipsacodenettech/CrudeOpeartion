@@ -9,33 +9,29 @@ import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useLoginUserMutation } from "./services/api";
 import { useState } from "react";
-import './all.min.css'
+import  secureLocalStorage  from  "react-secure-storage";
+
+import "./all.min.css";
 export default function Login() {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [disabled, setDisabled] = useState(false);
   const navigate = useNavigate();
   const initialValues = {
     email: "",
     password: "",
   };
-  useEffect(() => {
-    let token = localStorage.getItem("token");
-    if (token) {
-      navigate("/adduser");
-    }
-  }, []);
   const [Login, Loginresult] = useLoginUserMutation();
   const { isSuccess, isFetching, isError, error } = Loginresult;
+
   useEffect(() => {
     if (isSuccess && !isFetching) {
       setIsUpdating(false);
-      // console.log(Loginresult);
-      localStorage.setItem("email", values.email);
-      localStorage.setItem("token", Loginresult.data.data.token);
-      let token = localStorage.getItem("token");
+      secureLocalStorage.setItem("email", values.email);
+      secureLocalStorage.setItem("token", Loginresult.data.data.token);
+      let token = secureLocalStorage.getItem("token");
       if (token) {
         navigate("/adduser");
       }
-      // console.log(Loginresult.data.data.token);
     }
   }, [isSuccess, isFetching]);
   const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
@@ -47,7 +43,8 @@ export default function Login() {
           email: values?.email,
           password: values?.password,
         });
-        setIsUpdating(true)
+        setIsUpdating(true);
+        setDisabled(true);
       },
     });
   return (
@@ -112,12 +109,10 @@ export default function Login() {
               </div>
               <button
                 type="submit"
+                name="submit"
                 onClick={handleSubmit}
                 className="w-full px-16 py-3.5 mt-6 mb-4 font-bold leading-normal text-center text-white align-middle transition-all bg-cyan-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-[17px] ease-in tracking-tight-rem shadow-md bg-150 bg-x-25 "
-                disabled={
-                  !values.password ||
-                  !values.email 
-                }
+                disabled={disabled}
               >
                 {isUpdating ? (
                   <i className="fa fa-spinner animate-spin mr-2"></i>

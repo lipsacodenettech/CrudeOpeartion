@@ -3,13 +3,13 @@ import React from "react";
 import "react-responsive-modal/styles.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+// import  secureLocalStorage  from  "react-secure-storage";
 
 export default function Dashboard() {
-  
   const navigate = useNavigate();
 
   const Logout = () => {
-    window.localStorage.clear();
+    localStorage.clear();
     navigate("/");
   };
   return (

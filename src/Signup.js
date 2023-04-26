@@ -1,3 +1,4 @@
+/* eslint-disable no-const-assign */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable eqeqeq */
@@ -8,9 +9,11 @@ import { Link } from "react-router-dom";
 import { registerSchema } from "./schemas/regirster.jsx";
 import { useFormik } from "formik";
 import { useRegisterUserMutation } from "./services/api.js";
+import swal from "sweetalert";
+
 export default function Signup() {
   const navigate = useNavigate();
-
+  const [disabled, setDisabled] = useState(false);
   useEffect(() => {
     let token = localStorage.getItem("token");
     if (token) {
@@ -27,10 +30,9 @@ export default function Signup() {
   const { isSuccess, isFetching, isError, error } = RegisterResult;
   useEffect(() => {
     if (isSuccess && !isFetching) {
-      // console.log(RegisterResult);
-      alert("success");
+      navigate('/')
     }
-  }, []);
+  }, [isSuccess, isFetching]);
 
   const {
     values,
@@ -50,10 +52,7 @@ export default function Signup() {
         password: values.password,
         age: values.age,
       });
-      setFieldValue("name", null);
-      setFieldValue("email", null);
-      setFieldValue("password", null);
-      setFieldValue("age", null);
+      setDisabled(true);
     },
   });
   return (
@@ -130,12 +129,7 @@ export default function Signup() {
               <button
                 onClick={handleSubmit}
                 className="w-full px-16 py-3.5 mt-6 mb-4 font-bold leading-normal text-center text-white align-middle transition-all bg-cyan-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-sm ease-in tracking-tight-rem shadow-md bg-150 bg-x-25"
-                disabled={
-                  !values.name ||
-                  !values.email ||
-                  !values.password ||
-                  !values.age
-                }
+                disabled={disabled}
               >
                 Register
               </button>

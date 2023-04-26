@@ -67,6 +67,7 @@ export default function Adduser() {
   const {
     values,
     errors,
+    setErrors,
     touched,
     handleBlur,
     handleChange,
@@ -82,8 +83,19 @@ export default function Adduser() {
       formdata.append("price", values.price);
       formdata.append("brand", values.brand);
       formdata.append("color", values.color);
-      setIsUpdating(true);
-      InsertNewCar(formdata);
+      console.log(values?.name.length, "values?.name.length");
+      if (values?.name.length <= 2) {
+        console.log("if");
+        setErrors({ name: "name is too Short" });
+      } else if (values?.name.length >= 10) {
+        console.log("elseif");
+        setErrors({ name: "name is too long" });
+      } else {
+        console.log("else");
+        InsertNewCar(formdata);
+      }
+
+      // setIsUpdating(true);
     },
     handleChange(e) {
       initialValues({
@@ -125,7 +137,6 @@ export default function Adduser() {
   useEffect(() => {
     if (isSuccess && !isFetching) {
       setResult(result?.data.length > 0 ? result.data : []);
-      // console.log(result.data);
       setIsUpdating(false);
     }
     if (isFetching) {
@@ -133,7 +144,7 @@ export default function Adduser() {
     }
   }, [isSuccess, isFetching]);
 
-  // for deleting data
+  // for deleting dat
   const [delteCars, deleteCarsResult] = useDeleteCarMutation();
   const del = (id) => {
     SweetAlertdel(id);
@@ -194,7 +205,11 @@ export default function Adduser() {
     isError: isCarError,
     error: carError,
   } = CarResult;
-
+  useEffect(() => {
+    if (isCarError && !isCarFetching) {
+      SweetAlertAdd();
+    }
+  });
   // for setting null value when model is open on click of Add new car button
   function AddNew() {
     setButtonTxt("Add new");
@@ -319,7 +334,7 @@ export default function Adduser() {
           </tr>
         </thead>
         {isUpdating ? (
-          <i class="fa fa-spinner fa-spin text-[100px] text-cyan-600 ml-[200%] mt-[50%]"></i>
+          <i className="fa fa-spinner fa-spin text-[100px] text-cyan-600 ml-[200%] mt-[50%]"></i>
         ) : (
           <tbody>
             {Result?.map((i) => {
@@ -365,7 +380,7 @@ export default function Adduser() {
                       }}
                       className="btn btn-primary"
                     >
-                      <i class="fa-solid fa-trash mr-2"></i>
+                      <i className="fa-solid fa-trash mr-2"></i>
                       DELETE
                     </button>
                   </td>
@@ -402,12 +417,15 @@ export default function Adduser() {
                   name="name"
                   value={values?.name}
                   placeholder={
-                    errors.name && touched.name ? errors.name : "Enter name"
+                    errors.name && touched.name
+                      ? "Please enter car name"
+                      : "Enter name"
                   }
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
                 />
+                {errors.name && touched.name ? errors.name : ""}
               </tr>
               <tr>
                 <input
@@ -481,6 +499,7 @@ export default function Adduser() {
           </tr>
           <tr>
             <button
+              type="button"
               onClick={(e) => {
                 {
                   ButtonTxt === "Add new"
@@ -491,11 +510,11 @@ export default function Adduser() {
               className="btn btn-primary mt-[5%]"
             >
               {isUpdating ? (
-                <i class="fa fa-spinner fa-spin text-[20px] text-center mr-2"></i>
+                <i className="fa fa-spinner fa-spin text-[20px] text-center mr-2"></i>
               ) : ButtonTxt === "Add new" ? (
-                <i class="fa-sharp fa-solid fa-plus mr-2"></i>
+                <i className="fa-sharp fa-solid fa-plus mr-2"></i>
               ) : (
-                <i class="fa-regular fa-pen-to-square mr-2"></i>
+                <i className="fa-regular fa-pen-to-square mr-2"></i>
               )}
               {ButtonTxt}
             </button>

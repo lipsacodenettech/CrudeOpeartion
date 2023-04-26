@@ -6,12 +6,12 @@ import React from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-// import { useEffect } from "react";
+import  secureLocalStorage  from  "react-secure-storage";
 
 const ProtectedRoute = () => {
   const navigate = useNavigate();
-  const userType = window.localStorage.getItem("email");
-  const token = window.localStorage.getItem("token");
+  const userType = secureLocalStorage.getItem("email");
+  const token = secureLocalStorage.getItem("token");
   if (token) {
     let decodedToken = jwt_decode(token);
     // console.log("Decoded Token", decodedToken);
@@ -19,7 +19,7 @@ const ProtectedRoute = () => {
     var result = false;
     if (decodedToken.exp * 1000 < currentDate.getTime()) {
       // console.log("Token expired.");
-      window.localStorage.clear();
+      localStorage.clear();
       navigate("/");
     } else {
       // console.log("Valid token");
