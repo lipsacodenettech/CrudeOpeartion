@@ -14,15 +14,12 @@ const ProtectedRoute = () => {
   const token = secureLocalStorage.getItem("token");
   if (token) {
     let decodedToken = jwt_decode(token);
-    // console.log("Decoded Token", decodedToken);
     let currentDate = new Date();
     var result = false;
     if (decodedToken.exp * 1000 < currentDate.getTime()) {
-      // console.log("Token expired.");
       localStorage.clear();
       navigate("/");
     } else {
-      // console.log("Valid token");
       result = true;
     }
   }

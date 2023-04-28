@@ -20,6 +20,9 @@ import { Addschemas } from "./schemas/Add";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+var file = [];
+var SingleFile = [];
+
 // Just some styles
 const styles = {
   container: {
@@ -46,23 +49,22 @@ const styles = {
 
 export default function Adduser() {
   const [SelectedId, setSelectedID] = useState();
-  const [selectedImage, setSelectedImage] = useState();
+  const [IsInput, setIsInput] = useState(false);
   const [IsImageChanging, setIsImageChanging] = useState(false);
   const [Result, setResult] = useState([]);
-  const [imagUrl, setImgUrl] = useState("");
   const [ButtonTxt, setButtonTxt] = useState("update cars");
   const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [Count, setCount] = useState(0);
   const navigate = useNavigate();
-
-  var initialValues = { 
+  const [previewImages, SetPreviewImages] = useState([]);
+  var initialValues = {
     name: null,
     color: null,
     brand: null,
     price: null,
     car_file: null,
   };
-
   // formik validations
   const {
     values,
@@ -78,24 +80,22 @@ export default function Adduser() {
     validationSchema: Addschemas,
     onSubmit: (values, action) => {
       var formdata = new FormData();
-      formdata.append("car_file", values.car_file);
+      for (let i = 0; i < Object.keys(values.car_file).length; i++) {
+        formdata.append("car_file", values.car_file[i]);
+      }
       formdata.append("name", values.name);
       formdata.append("price", values.price);
       formdata.append("brand", values.brand);
       formdata.append("color", values.color);
-      console.log(values?.name.length, "values?.name.length");
       if (values?.name.length <= 2) {
-        console.log("if");
         setErrors({ name: "name is too Short" });
       } else if (values?.name.length >= 10) {
-        console.log("elseif");
         setErrors({ name: "name is too long" });
       } else {
-        console.log("else");
         InsertNewCar(formdata);
+        SingleFile = [];
+        file = [];
       }
-
-      // setIsUpdating(true);
     },
     handleChange(e) {
       initialValues({
@@ -104,12 +104,15 @@ export default function Adduser() {
       });
     },
   });
-
+  function AddInput() {
+    setIsInput(true);
+    setCount(Count + 1);
+  }
   // This function will be triggered when the "Remove This Image" button is clicked
   const removeSelectedImage = () => {
-    setSelectedImage();
+    file = [];
+    SingleFile = [];
   };
-
   // for open pop up
   function HandelPopUpOpen() {
     setIsModalOpen(true);
@@ -118,8 +121,10 @@ export default function Adduser() {
   //  for close pop up
   function HandelPopUpClose() {
     setIsModalOpen(false);
-    setSelectedImage("");
-    setImgUrl("");
+    file = [];
+    SingleFile = [];
+    setIsInput(false);
+    setCount(0);
   }
 
   // log out
@@ -159,15 +164,21 @@ export default function Adduser() {
 
   // for selecting user on click of edit button
   function selectUser(data) {
+    file = [];
+    SingleFile = [];
     setFieldValue("name", data.name);
     setFieldValue("color", data.color);
     setFieldValue("brand", data.brand);
     setFieldValue("price", data.price);
-    setFieldValue("car_file", data.car_file);
-    setImgUrl(`${process.env.REACT_APP_BASE_URL}/file/${data.image}`);
-    // console.log(imagUrl);
+    SetPreviewImages(data.image);
+
+    for (let i = 0; i < Object.keys(data.image).length; i++) {
+      setFieldValue(
+        "car_file",
+        `${process.env.REACT_APP_BASE_URL}/file/${data.image}}`
+      );
+    }
     setSelectedID(data._id);
-    setSelectedImage("");
   }
 
   // for updating user on click of update user
@@ -179,12 +190,14 @@ export default function Adduser() {
     error: upError,
   } = Updateresult;
 
-  const updateUser = (e) => {
+  const updateUser = () => {
     var formdata = new FormData();
-    if (selectedImage) {
-      formdata.append("car_file", selectedImage);
-      // console.log(selectedImage, "if call");
+    if (file) {
+      for (let i = 0; i < Object.keys(values.car_file).length; i++) {
+        formdata.append("car_file", values.car_file[i]);
+      }
     }
+    console.log(values.car_file);
     formdata.append("name", values.name);
     formdata.append("price", values.price);
     formdata.append("brand", values.brand);
@@ -195,6 +208,8 @@ export default function Adduser() {
     };
     setIsUpdating(true);
     UpdateCar(update);
+    file = [];
+    SingleFile = [];
   };
 
   // for inserting new car
@@ -220,6 +235,8 @@ export default function Adduser() {
     setFieldValue("car_file", null);
     HandelPopUpOpen();
     setIsImageChanging(false);
+    SingleFile = [];
+    file = [];
   }
 
   // common use effect for  getting all data
@@ -345,19 +362,21 @@ export default function Adduser() {
                   <td>{i?.price}</td>
                   <td>{i?.brand}</td>
                   <td>
-                    <img
-                      src={`${process.env.REACT_APP_BASE_URL}/file/${i.image}`}
-                      className="img-fluid"
-                      alt="profile-image"
-                      height="150px"
-                      width="150px"
-                      onClick={() => {
-                        HandelPopUpOpen();
-                        selectUser(i);
-                        setIsImageChanging(true);
-                        setButtonTxt("update image");
-                      }}
-                    />
+                    {i.image.map((images) => (
+                      <img
+                        src={`${process.env.REACT_APP_BASE_URL}/file/${images}`}
+                        className="img-fluid"
+                        alt="profile-image"
+                        height="150px"
+                        width="150px"
+                        onClick={() => {
+                          HandelPopUpOpen();
+                          selectUser(i);
+                          setIsImageChanging(true);
+                          setButtonTxt("update image");
+                        }}
+                      />
+                    ))}
                   </td>
                   <td>
                     <button
@@ -386,7 +405,7 @@ export default function Adduser() {
                   </td>
                 </tr>
               );
-            })}{" "}
+            })}
           </tbody>
         )}
       </table>
@@ -472,23 +491,64 @@ export default function Adduser() {
             <td>
               <input
                 name="car_file"
+                // multiple
                 type="file"
                 onChange={(e) => {
-                  setFieldValue("car_file", e.currentTarget.files[0]);
-                  setSelectedImage(e.currentTarget.files[0]);
+                  SingleFile.push(e.target.files[0]);
+                  setFieldValue("car_file", SingleFile);
+                  file.push(URL.createObjectURL(e.target.files[0]));
                 }}
               />
-              {!selectedImage ? (
+              <button
+                onClick={() => {
+                  AddInput();
+                }}
+              >
+                <i class="fa-solid fa-plus"></i>
+              </button>
+              {IsInput
+                ? Array(Count)
+                    ?.fill("-")
+                    ?.map(() => {
+                      return (
+                        <>
+                          <input
+                            name="car_file"
+                            type="file"
+                            onChange={(e) => {
+                              SingleFile.push(e.target.files[0]);
+                              setFieldValue("car_file", SingleFile);
+                              file.push(URL.createObjectURL(e.target.files[0]));
+                            }}
+                          />
+                        </>
+                      );
+                    })
+                : null}
+
+              {file.length === 0 ? (
                 <div style={styles.preview}>
-                  <img src={imagUrl} style={styles.image} alt="Thumb" />
+                  {ButtonTxt === "Add new"
+                    ? null
+                    : previewImages.map((images) => (
+                        <img
+                          style={styles.image}
+                          src={`${process.env.REACT_APP_BASE_URL}/file/${images}`}
+                          className="img-fluid"
+                          alt="thumb"
+                        />
+                      ))}
                 </div>
               ) : (
                 <div style={styles.preview}>
-                  <img
-                    src={URL.createObjectURL(selectedImage)}
-                    style={styles.image}
-                    alt=""
-                  />
+                  {file.map((images) => (
+                    <img
+                      style={styles.image}
+                      src={images}
+                      className="img-fluid"
+                      alt="thumb"
+                    />
+                  ))}
                   <button onClick={removeSelectedImage} style={styles.delete}>
                     Remove This Image
                   </button>
