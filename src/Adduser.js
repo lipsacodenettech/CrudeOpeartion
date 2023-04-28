@@ -49,7 +49,6 @@ const styles = {
 
 export default function Adduser() {
   const [SelectedId, setSelectedID] = useState();
-  const [IsInput, setIsInput] = useState(false);
   const [IsImageChanging, setIsImageChanging] = useState(false);
   const [Result, setResult] = useState([]);
   const [ButtonTxt, setButtonTxt] = useState("update cars");
@@ -105,7 +104,6 @@ export default function Adduser() {
     },
   });
   function AddInput() {
-    setIsInput(true);
     setCount(Count + 1);
   }
   // This function will be triggered when the "Remove This Image" button is clicked
@@ -123,7 +121,7 @@ export default function Adduser() {
     setIsModalOpen(false);
     file = [];
     SingleFile = [];
-    setIsInput(false);
+    // setIsInput(false);
     setCount(0);
   }
 
@@ -491,7 +489,6 @@ export default function Adduser() {
             <td>
               <input
                 name="car_file"
-                // multiple
                 type="file"
                 onChange={(e) => {
                   SingleFile.push(e.target.files[0]);
@@ -506,7 +503,7 @@ export default function Adduser() {
               >
                 <i class="fa-solid fa-plus"></i>
               </button>
-              {IsInput
+              {Count !== 0
                 ? Array(Count)
                     ?.fill("-")
                     ?.map(() => {
