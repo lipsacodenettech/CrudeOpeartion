@@ -14,7 +14,7 @@ function App() {
     <div>
       <Routes>
         <Route path="/" element={<Login />} />
-          <Route path="/sign_up" element={<Signup />} />
+        <Route path="/sign_up" element={<Signup />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/adduser" element={<Adduser />} />
           <Route path="/Dashboard" element={<Dashboard />} />

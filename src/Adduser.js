@@ -1,3 +1,4 @@
+/* eslint-disable no-array-constructor */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable no-use-before-define */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -19,33 +20,7 @@ import { useFormik } from "formik";
 import { Addschemas } from "./schemas/Add";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
-var file = [];
-var SingleFile = [];
-
-// Just some styles
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 50,
-  },
-  preview: {
-    marginTop: 50,
-    display: "flex",
-    flexDirection: "column",
-  },
-  image: { maxWidth: "100%", maxHeight: 320 },
-  delete: {
-    cursor: "pointer",
-    padding: 15,
-    background: "red",
-    color: "white",
-    border: "none",
-  },
-};
+import Child from "./Child";
 
 export default function Adduser() {
   const [SelectedId, setSelectedID] = useState();
@@ -54,9 +29,8 @@ export default function Adduser() {
   const [ButtonTxt, setButtonTxt] = useState("update cars");
   const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [Count, setCount] = useState(0);
+  const [image, setImage] = useState([]);
   const navigate = useNavigate();
-  const [previewImages, SetPreviewImages] = useState([]);
   var initialValues = {
     name: null,
     color: null,
@@ -79,8 +53,8 @@ export default function Adduser() {
     validationSchema: Addschemas,
     onSubmit: (values, action) => {
       var formdata = new FormData();
-      for (let i = 0; i < Object.keys(values.car_file).length; i++) {
-        formdata.append("car_file", values.car_file[i]);
+      for (let i = 0; i < values.car_file.length; i++) {
+        formdata.append("car_file", values.car_file[i].image);
       }
       formdata.append("name", values.name);
       formdata.append("price", values.price);
@@ -92,8 +66,6 @@ export default function Adduser() {
         setErrors({ name: "name is too long" });
       } else {
         InsertNewCar(formdata);
-        SingleFile = [];
-        file = [];
       }
     },
     handleChange(e) {
@@ -103,32 +75,23 @@ export default function Adduser() {
       });
     },
   });
-  function AddInput() {
-    setCount(Count + 1);
-  }
-  // This function will be triggered when the "Remove This Image" button is clicked
-  const removeSelectedImage = () => {
-    file = [];
-    SingleFile = [];
-  };
   // for open pop up
   function HandelPopUpOpen() {
     setIsModalOpen(true);
   }
+  useEffect(() => {
+    console.log(image, "image");
+  }, [image]);
 
   //  for close pop up
   function HandelPopUpClose() {
     setIsModalOpen(false);
-    file = [];
-    SingleFile = [];
-    // setIsInput(false);
-    setCount(0);
+    setImage([]);
   }
-
   // log out
   const Logout = () => {
     window.localStorage.clear();
-    navigate("/");
+    navigate("/login");
   };
 
   // getting all data
@@ -162,20 +125,35 @@ export default function Adduser() {
 
   // for selecting user on click of edit button
   function selectUser(data) {
-    file = [];
-    SingleFile = [];
     setFieldValue("name", data.name);
     setFieldValue("color", data.color);
     setFieldValue("brand", data.brand);
     setFieldValue("price", data.price);
-    SetPreviewImages(data.image);
 
-    for (let i = 0; i < Object.keys(data.image).length; i++) {
-      setFieldValue(
-        "car_file",
-        `${process.env.REACT_APP_BASE_URL}/file/${data.image}}`
-      );
+    let images = [];
+    getDataBlob(`${process.env.REACT_APP_BASE_URL}/file/${data.image}`);
+    async function getDataBlob(url) {
+      var res = await fetch(url);
+      var blob = await res.blob();
+      var base64img = await parseURI(blob);
+      console.log(base64img);
     }
+    async function parseURI(d) {
+      var reader = new FileReader();
+      reader.readAsDataURL(d);
+      return new Promise((res, rej) => {
+        reader.onload = (e) => {
+          for (let i = 0; i < data.image.length; i++) {
+            let object = {
+              image: e.target.result,
+            };
+            images.push(object);
+          }
+        };
+      });
+    }
+
+    setImage(images);
     setSelectedID(data._id);
   }
 
@@ -190,12 +168,11 @@ export default function Adduser() {
 
   const updateUser = () => {
     var formdata = new FormData();
-    if (file) {
-      for (let i = 0; i < Object.keys(values.car_file).length; i++) {
-        formdata.append("car_file", values.car_file[i]);
+    if (image) {
+      for (let i = 0; i < values.car_file.length; i++) {
+        formdata.append("car_file", values.car_file[i].image);
       }
     }
-    console.log(values.car_file);
     formdata.append("name", values.name);
     formdata.append("price", values.price);
     formdata.append("brand", values.brand);
@@ -206,8 +183,6 @@ export default function Adduser() {
     };
     setIsUpdating(true);
     UpdateCar(update);
-    file = [];
-    SingleFile = [];
   };
 
   // for inserting new car
@@ -233,8 +208,6 @@ export default function Adduser() {
     setFieldValue("car_file", null);
     HandelPopUpOpen();
     setIsImageChanging(false);
-    SingleFile = [];
-    file = [];
   }
 
   // common use effect for  getting all data
@@ -288,9 +261,6 @@ export default function Adduser() {
       if (willDelete) {
         setIsUpdating(true);
         delteCars(id);
-        // swal(" record has been deleted!", {
-        //   icon: "success",
-        // });
       } else {
         swal("Your record is safe!");
         setIsUpdating(false);
@@ -317,8 +287,19 @@ export default function Adduser() {
       button: "Okay!",
     });
   }
+  const [person, setPerson] = useState([
+    {
+      name: "test",
+      age: 15,
+    },
+    {
+      name: "test2",
+      age: 13,
+    },
+  ]);
   return (
     <div>
+      <br />
       Adduser page <br />
       <Link to="/dashboard">DASHBOARD </Link>
       <button
@@ -487,70 +468,42 @@ export default function Adduser() {
           )}
           <tr>
             <td>
-              <input
-                name="car_file"
-                type="file"
-                onChange={(e) => {
-                  SingleFile.push(e.target.files[0]);
-                  setFieldValue("car_file", SingleFile);
-                  file.push(URL.createObjectURL(e.target.files[0]));
-                }}
-              />
-              <button
-                onClick={() => {
-                  AddInput();
-                }}
-              >
-                <i class="fa-solid fa-plus"></i>
-              </button>
-              {Count !== 0
-                ? Array(Count)
-                    ?.fill("-")
-                    ?.map(() => {
-                      return (
-                        <>
-                          <input
-                            name="car_file"
-                            type="file"
-                            onChange={(e) => {
-                              SingleFile.push(e.target.files[0]);
-                              setFieldValue("car_file", SingleFile);
-                              file.push(URL.createObjectURL(e.target.files[0]));
-                            }}
-                          />
-                        </>
-                      );
-                    })
-                : null}
-
-              {file.length === 0 ? (
-                <div style={styles.preview}>
-                  {ButtonTxt === "Add new"
-                    ? null
-                    : previewImages.map((images) => (
-                        <img
-                          style={styles.image}
-                          src={`${process.env.REACT_APP_BASE_URL}/file/${images}`}
-                          className="img-fluid"
-                          alt="thumb"
-                        />
-                      ))}
-                </div>
-              ) : (
-                <div style={styles.preview}>
-                  {file.map((images) => (
-                    <img
-                      style={styles.image}
-                      src={images}
-                      className="img-fluid"
-                      alt="thumb"
-                    />
-                  ))}
-                  <button onClick={removeSelectedImage} style={styles.delete}>
-                    Remove This Image
-                  </button>
-                </div>
-              )}
+              <div>
+                <button
+                  onClick={() => {
+                    setImage([...image, { image: "" }]);
+                  }}
+                  className="btn btn-primary"
+                >
+                  <i className="fa-solid fa-plus"></i>Add new Image
+                </button>
+                <br />
+                {image?.map((m, i) => {
+                  return (
+                    <>
+                      <Child
+                        onUploadImage={(e) => {
+                          console.log(image);
+                          let k = image;
+                          k[i] = {
+                            image: e.target.files[0],
+                          };
+                          setImage([...k]);
+                          console.log([...k], "k");
+                          setFieldValue("car_file", k);
+                        }}
+                        image={m}
+                        removeimage={(e) => {
+                          let s = image;
+                          s[i] = { image: "" };
+                          setFieldValue("car_file", s);
+                        }}
+                      />
+                      <br />
+                    </>
+                  );
+                })}
+              </div>
             </td>
           </tr>
           <tr>

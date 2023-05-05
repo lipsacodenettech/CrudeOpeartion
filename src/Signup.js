@@ -30,7 +30,7 @@ export default function Signup() {
   const { isSuccess, isFetching, isError, error } = RegisterResult;
   useEffect(() => {
     if (isSuccess && !isFetching) {
-      navigate('/')
+      navigate('/login')
     }
   }, [isSuccess, isFetching]);
 
