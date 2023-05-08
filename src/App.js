@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Routes, Route } from "react-router-dom";
 import Signup from "./Signup";
 import ProtectedRoute from "./ProtectedRoute";
+import Profile from "./Component/Profile";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/sign_up" element={<Signup />} />
         <Route element={<ProtectedRoute />}>
+          <Route path="/profile" element={<Profile />} />
           <Route path="/adduser" element={<Adduser />} />
           <Route path="/Dashboard" element={<Dashboard />} />
         </Route>

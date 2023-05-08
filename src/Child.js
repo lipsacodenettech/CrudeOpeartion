@@ -15,10 +15,13 @@ const styles = {
     display: "flex",
     flexDirection: "column",
   },
-  image: { maxWidth: "100%", maxHeight: 320 },
+  // image: { maxWidth: "100%", maxHeight: 320 },
   delete: {
     cursor: "pointer",
-    padding: 15,
+    paddingLeft: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingRight: 10,
     background: "red",
     color: "white",
     border: "none",
@@ -30,7 +33,7 @@ export default function Child({ onUploadImage, image, removeimage }) {
     <>
       <div style={styles.preview}>
         <>
-          <input name="car_file" type="file" onChange={onUploadImage} />
+          <input name="car_file" type="file" className="text-xs md:text-xl mb-4" onChange={onUploadImage} />
           {image.image === "" ? null : (
             <img
               style={styles.image}
@@ -40,8 +43,8 @@ export default function Child({ onUploadImage, image, removeimage }) {
               alt="thumb"
             />
           )}
-          <button onClick={removeimage} style={styles.delete}>
-            Remove This Image
+          <button onClick={removeimage} className="w-fit" >
+          <span className="text-xs md:text-xl w-fit " style={styles.delete}>  Remove This Image</span>
           </button>
         </>
       </div>

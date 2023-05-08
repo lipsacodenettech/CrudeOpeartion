@@ -17,7 +17,7 @@ const ProtectedRoute = () => {
     let currentDate = new Date();
     var result = false;
     if (decodedToken.exp * 1000 < currentDate.getTime()) {
-      localStorage.clear();
+      localStorage.removeItem();
       navigate("/");
     } else {
       result = true;

@@ -30,7 +30,7 @@ export default function Login() {
       secureLocalStorage.setItem("token", Loginresult.data.data.token);
       let token = secureLocalStorage.getItem("token");
       if (token) {
-        navigate("/adduser");
+        navigate("/dashboard");
       }
     }
   }, [isSuccess, isFetching]);

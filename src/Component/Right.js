@@ -102,7 +102,7 @@ export default function Right() {
                     className="text-[#737B8B] no-underline text-[0.875rem] md:text-[1.125rem]"
                   >
                     Dashboard
-                  </a>{" "}
+                  </a>
                 </li>
                 <li className="before:float-left before:pr-2 before:content-['/'] pl-2 text-[#216FED]">
                   <a
@@ -284,7 +284,7 @@ export default function Right() {
                         </div>
                         <Menu
                           as="div"
-                          className="relative inline-block text-left"
+                          className="relative inline-block z-20 text-left"
                         >
                           <div>
                             <Menu.Button className="inline-flex relative w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900   hover:bg-gray-50">
@@ -299,8 +299,8 @@ export default function Right() {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95"
                           >
-                            <Menu.Items className="absolute m-0 inset-x-auto inset-y-0  ">
-                              <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right  bg-white shadow-lg  ">
+                            <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md border-none focus:outline-none">
+                              <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right shadow-lg bg-white  ">
                                 <Menu.Item>
                                   <a
                                     className="py-[0.375rem] block pr-[20px] text-left  w-full text-[0.875rem] text-[#737B8B] bg-transparent border-0 no-underline"
@@ -349,10 +349,8 @@ export default function Right() {
                         </div>
                         <div>
                           <Bar
-                            style={{ padding: "20px", width: "80%" }}
+                            style={{ padding: "20px" }}
                             data={data}
-                            width={"250vh"}
-                            height={"250vh"}
                             options={options}
                           ></Bar>
                         </div>
@@ -368,7 +366,7 @@ export default function Right() {
                         <div>
                           <Menu
                             as="div"
-                            className="relative inline-block text-left"
+                            className="relative inline-block z-20 text-left"
                           >
                             <div>
                               <Menu.Button className="inline-flex relative w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900   hover:bg-gray-50">
@@ -383,8 +381,8 @@ export default function Right() {
                               leaveFrom="transform opacity-100 scale-100"
                               leaveTo="transform opacity-0 scale-95"
                             >
-                              <Menu.Items className="absolute m-0 inset-x-auto inset-y-0  ">
-                                <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right  bg-white shadow-lg  ">
+                              <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md border-none focus:outline-none">
+                                <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right shadow-lg bg-white  ">
                                   <Menu.Item>
                                     <a
                                       className="py-[0.375rem] block pr-[20px] text-left  w-full text-[0.875rem] text-[#737B8B] bg-transparent border-0 no-underline"
@@ -454,7 +452,7 @@ export default function Right() {
                           data={data1}
                           width={"250vh"}
                           height={"250vh"}
-                          style={{ padding: "20px", width: "80%" }}
+                          style={{ padding: "20px" }}
                         />
                       </div>
                     </div>
@@ -479,11 +477,11 @@ export default function Right() {
                 </div>
                 <div className="col-lg-12">
                   <div className="mb-[1.875rem] bg-white relative border-0 border-solid border-transparent rounded-3xl shadow-sm h-[calc(100% - 30px)] flex flex-col min-w-0 bg-clip-border">
-                    <div className=" rounded-sm  flex relative bg-transparent pt-6 pb-6 px-[1.875rem] justify-between items-center border-0 block mb-0">
+                    <div className=" rounded-sm  flex relative bg-transparent pt-6 pb-6 px-[1.875rem] justify-between items-center border-0  mb-0">
                       <h4 className="text-lg">Propeties Map</h4>
                       <Menu
                         as="div"
-                        className="relative inline-block text-left"
+                        className="relative inline-block text-left z-20"
                       >
                         <div>
                           <Menu.Button className="inline-flex relative w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900   hover:bg-gray-50">
@@ -498,8 +496,8 @@ export default function Right() {
                           leaveFrom="transform opacity-100 scale-100"
                           leaveTo="transform opacity-0 scale-95"
                         >
-                          <Menu.Items className="absolute m-0 inset-x-auto inset-y-0  ">
-                            <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right  bg-white shadow-lg  ">
+                          <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md border-none focus:outline-none">
+                            <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right shadow-lg bg-white  ">
                               <Menu.Item>
                                 <a
                                   className="py-[0.375rem] block pr-[20px] text-left  w-full text-[0.875rem] text-[#737B8B] bg-transparent border-0 no-underline"
@@ -529,9 +527,9 @@ export default function Right() {
               </div>
             </div>
             <div className="col-xl-4 col-xxl-4">
-              <div className="row relative x-10">
+              <div className="row">
                 <div className="col-xl-12">
-                  <div className="mb-8 bg-white relative rounded-lg transition-all border-0 border-transparent border-solid shadow-sm height-[calc(100% - 30px)]">
+                  <div className="mb-8 bg-white relative rounded-3xl transition-all border-0 border-transparent border-solid shadow-sm height-[calc(100% - 30px)]">
                     <div className=" p-4 flex-auto pb-4 ">
                       <p className="font-medium text-black  text-base mb-2  flex">
                         Product Viewed
@@ -564,13 +562,13 @@ export default function Right() {
                   </div>
                 </div>
                 <div className="col-xl-12 col-md-6">
-                  <div className="mb-8 bg-white relative rounded-lg transition-all border-0 border-transparent border-solid shadow-sm height-[calc(100% - 30px)]">
+                  <div className="mb-8 bg-white relative rounded-3xl transition-all border-0 border-transparent border-solid shadow-sm height-[calc(100% - 30px)]">
                     <div className="rounded-3xl relative bg-transparent pt-4  px-[1.875rem] flex justify-between items-center">
                       <h4 className="text-lg">Customer Review</h4>
                       <div>
                         <Menu
                           as="div"
-                          className="relative inline-block text-left"
+                          className="relative inline-block z-20 text-left"
                         >
                           <div>
                             <Menu.Button className="inline-flex relative w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900   hover:bg-gray-50">
@@ -585,8 +583,8 @@ export default function Right() {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95"
                           >
-                            <Menu.Items className="absolute m-0 inset-x-auto inset-y-0  ">
-                              <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right  bg-white shadow-lg  ">
+                            <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md border-none focus:outline-none">
+                              <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right shadow-lg bg-white  ">
                                 <Menu.Item>
                                   <a
                                     className="py-[0.375rem] block pr-[20px] text-left  w-full text-[0.875rem] text-[#737B8B] bg-transparent border-0 no-underline"
@@ -643,12 +641,13 @@ export default function Right() {
                           <img
                             className="rounded-full mr-4"
                             width="40px"
-                            src={require("../img/asset 7.jpeg")}
+                            src={require("../img/pic22.jpg")}
                             alt=""
+                            
                           />
                           <div>
                             <h6 className="text-black font-medium text-base mb-0 ">
-                            Bella Smith
+                              Bella Smith
                             </h6>
                             <span className="text-sm">20m ago</span>
                           </div>
@@ -660,7 +659,13 @@ export default function Right() {
                             <i class="fa-solid fa-star text-slate-400"></i>
                           </div>
                           <p class="mb-0 pb-0 text-sm">
-                          Dealing with Syamsudin and Bakri was a joy. I got in touch with Just Property after seeing a couple of properties that caught my eye. Both Syamsudin and Bakri strive to deliver a professional service and surpassed my expectations - they were not only helpful but extremely approachable and not at all bumptious...
+                            Dealing with Syamsudin and Bakri was a joy. I got in
+                            touch with Just Property after seeing a couple of
+                            properties that caught my eye. Both Syamsudin and
+                            Bakri strive to deliver a professional service and
+                            surpassed my expectations - they were not only
+                            helpful but extremely approachable and not at all
+                            bumptious...
                           </p>
                         </div>
                       </div>
@@ -669,7 +674,7 @@ export default function Right() {
                           <img
                             className="rounded-full mr-4"
                             width="40px"
-                            src={require("../img/asset 8.jpeg")}
+                            src={require("../img/pic33.jpg")}
                             alt=""
                           />
                           <div>
@@ -694,19 +699,20 @@ export default function Right() {
                       </div>
                     </div>
                     <div className="border-0 pt-0 pb-4   px-[1.875rem]">
-                      <a href="#" className="btn btn-primary block w-full">See More Reviews</a>
+                      <a href="#" className="btn btn-primary block w-full">
+                        See More Reviews
+                      </a>
                     </div>
                   </div>
                 </div>
                 <div className="col-xl-12 col-md-6">
                   <div className="h-[calc(100% - 30px)] mb-[1.875rem] bg-white  transition-all ease-in relative border-0 rounded-3xl shadow-sm">
-                    <div className="p-[1.875rem] items-center justify-between flex  flex-auto break-words">
+                    <div className="p-[1.875rem]  items-center justify-between flex  flex-auto break-words">
                       <h4 className="text-xl">Recent Customer</h4>
                       <div>
-                        {" "}
                         <Menu
                           as="div"
-                          className="relative inline-block text-left"
+                          className="relative inline-block z-20 text-left"
                         >
                           <div>
                             <Menu.Button className="inline-flex relative w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900   hover:bg-gray-50">
@@ -721,8 +727,8 @@ export default function Right() {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95"
                           >
-                            <Menu.Items className="absolute m-0 inset-x-auto inset-y-0  ">
-                              <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right  bg-white shadow-lg  ">
+                            <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md border-none focus:outline-none">
+                              <div className=" flex flex-col py-1  rounded-3xl z-10 mt-2  px-4 origin-top-right shadow-lg bg-white  ">
                                 <Menu.Item>
                                   <a
                                     className="py-[0.375rem] block pr-[20px] text-left  w-full text-[0.875rem] text-[#737B8B] bg-transparent border-0 no-underline"
@@ -745,7 +751,7 @@ export default function Right() {
                         </Menu>
                       </div>
                     </div>
-                    <div className="p-[1.875rem]  flex-auto">
+                    <div className="p-[1.875rem] pt-0 flex-auto">
                       <div className="flex items-center mb-4">
                         <div className="mr-4 ">
                           <img
@@ -838,7 +844,9 @@ export default function Right() {
                       </div>
                     </div>
                     <div className="border-0 pt-0 pb-4   px-[1.875rem]">
-                      <a href="#" className="btn btn-primary block w-full"><i class="fa-solid fa-plus"></i>Add new Customer</a>
+                      <a href="#" className="btn btn-primary block w-full">
+                        <i class="fa-solid fa-plus"></i>Add new Customer
+                      </a>
                     </div>
                   </div>
                 </div>

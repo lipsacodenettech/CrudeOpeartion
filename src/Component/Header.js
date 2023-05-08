@@ -2,8 +2,16 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
+import { Menu, Transition } from "@headlessui/react";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
+  const Logout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
   return (
     <div className="z-20 fixed">
       <div className="fixed py-[1rem] z-20 rounded-tl-0 rounded-tr-0  lg:w-[13rem] md:w-[6.5rem] bg-[#F2F6FC] flex pl-5 pr-5 justify-start items-center text-lg text-black  transition-all ease-in ">
@@ -60,12 +68,76 @@ export default function Header() {
                             robertocarloz@mail.com
                           </small>
                         </div>
-                        <img
-                          src={require("../img/Interior-NA-600x600.jpg")}
-                          width="20"
-                          alt=""
-                          className="w-9 h-9 rounded-full"
-                        ></img>
+
+                        <div>
+                          <Menu
+                            as="div"
+                            className="relative inline-block z-20 text-left"
+                          >
+                            <div>
+                              <Menu.Button className="inline-flex relative ">
+                                <img
+                                  src={require("../img/Interior-NA-600x600.jpg")}
+                                  width="20"
+                                  alt=""
+                                  className="w-9 h-9 rounded-full"
+                                ></img>
+                              </Menu.Button>
+                            </div>
+                            <Transition
+                              enter="transition ease-out duration-100"
+                              enterFrom="transform opacity-0 scale-95"
+                              enterTo="transform opacity-100 scale-100"
+                              leave="transition ease-in duration-75"
+                              leaveFrom="transform opacity-100 scale-100"
+                              leaveTo="transform opacity-0 scale-95"
+                            >
+                              <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md border-none focus:outline-none">
+                                <div className=" flex flex-col  items-center rounded-3xl z-10 mt-2 py-2 px-4  shadow-lg bg-white  ">
+                                  <Menu.Item>
+                                    <div className="flex">
+                                      <Link
+                                        to="/profile"
+                                        className="py-[0.375rem] block text-left  w-full text-[0.875rem] text-[#737B8B] bg-transparent border-0 no-underline"
+                                      >
+                                        <i class="fa-regular fa-user mr-4 py-[0.375rem]  text-primary"></i>
+                                      </Link>
+
+                                      <Link
+                                        to="/profile"
+                                        className="py-[0.375rem] block pr-[20px] text-left  w-full text-[0.875rem] text-[#737B8B] bg-transparent border-0 no-underline"
+                                      >
+                                        Profile
+                                      </Link>
+                                    </div>
+                                  </Menu.Item>
+                                  <Menu.Item>
+                                    <div className="flex">
+                                      <i class="fa-regular fa-envelope mr-4 py-[0.375rem]  text-[#66f385]"></i>
+                                      <span className="py-[0.375rem] block pr-[20px] text-left  w-full text-[0.875rem] text-[#737B8B] bg-transparent border-0 no-underline">
+                                        Inbox
+                                      </span>
+                                    </div>
+                                  </Menu.Item>
+                                  <Menu.Item>
+                                    <div className="flex">
+                                      <i
+                                        class="fa-solid fa-arrow-right-from-bracket mr-2 py-[0.375rem]  text-danger  "
+                                        onClick={Logout}
+                                      ></i>
+                                      <button
+                                        onClick={Logout}
+                                        className="py-[0.375rem] cursor-pointer block pr-[20px] text-left  w-full text-[0.875rem] text-[#737B8B] bg-transparent border-0 no-underline"
+                                      >
+                                        Logout
+                                      </button>
+                                    </div>
+                                  </Menu.Item>
+                                </div>
+                              </Menu.Items>
+                            </Transition>
+                          </Menu>
+                        </div>
                       </div>
                     </li>
                   </ul>

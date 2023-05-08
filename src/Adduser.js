@@ -18,9 +18,12 @@ import {
 import swal from "sweetalert";
 import { useFormik } from "formik";
 import { Addschemas } from "./schemas/Add";
-import { Link } from "react-router-dom";
+
 import { useNavigate } from "react-router-dom";
 import Child from "./Child";
+import Header from "./Component/Header";
+import Sidebar from "./Component/Sidebar";
+import Footer from "./Component/Footar";
 
 export default function Adduser() {
   const [SelectedId, setSelectedID] = useState();
@@ -79,10 +82,6 @@ export default function Adduser() {
   function HandelPopUpOpen() {
     setIsModalOpen(true);
   }
-  useEffect(() => {
-    console.log(image, "image");
-  }, [image]);
-
   //  for close pop up
   function HandelPopUpClose() {
     setIsModalOpen(false);
@@ -299,237 +298,261 @@ export default function Adduser() {
   ]);
   return (
     <div>
-      <br />
-      Adduser page <br />
-      <Link to="/dashboard">DASHBOARD </Link>
-      <button
-        onClick={Logout}
-        className="w-[10%]  py-2  mt-6 mb-4 font-bold leading-normal text-center text-white align-middle transition-all bg-cyan-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-sm ease-in tracking-tight-rem shadow-md bg-150 bg-x-25 "
-      >
-        Logout
-      </button>
-      <button
-        className="btn btn-primary ml-[80%]"
-        onClick={() => {
-          AddNew();
-        }}
-      >
-        Add New cars
-      </button>
-      <form action=""></form>
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">color</th>
-            <th scope="col">price</th>
-            <th scope="col">brand</th>
-            <th scope="col">image</th>
-            <th scope="col">edit</th>
-            <th scope="col">delete</th>
-          </tr>
-        </thead>
-        {isUpdating ? (
-          <i className="fa fa-spinner fa-spin text-[100px] text-cyan-600 ml-[200%] mt-[50%]"></i>
-        ) : (
-          <tbody>
-            {Result?.map((i) => {
-              return (
-                <tr>
-                  <td> {i?.name}</td>
-                  <td>{i?.color}</td>
-                  <td>{i?.price}</td>
-                  <td>{i?.brand}</td>
-                  <td>
-                    {i.image.map((images) => (
-                      <img
-                        src={`${process.env.REACT_APP_BASE_URL}/file/${images}`}
-                        className="img-fluid"
-                        alt="profile-image"
-                        height="150px"
-                        width="150px"
-                        onClick={() => {
-                          HandelPopUpOpen();
-                          selectUser(i);
-                          setIsImageChanging(true);
-                          setButtonTxt("update image");
-                        }}
-                      />
-                    ))}
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => {
-                        setButtonTxt("update cars");
-                        HandelPopUpOpen();
-                        selectUser(i);
-                        setIsImageChanging(false);
-                      }}
-                    >
-                      EDIT
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        del(i._id);
-                      }}
-                      className="btn btn-primary"
-                    >
-                      <i className="fa-solid fa-trash mr-2"></i>
-                      DELETE
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        )}
-      </table>
-      <Modal
-        classNames={{
-          modal: "customModal",
-          closeIcon: "color",
-        }}
-        open={isModalOpen}
-        onClose={() => HandelPopUpClose()}
-        center
-        animationDuration={300}
-        closeOnEsc={false}
-        closeOnOverlayClick={false}
-        styles={{
-          overlay: {
-            height: "800px",
-            padding: "20px",
-          },
-        }}
-      >
-        <div>
-          {IsImageChanging ? null : (
-            <>
+      <Header />
+      <Sidebar />
+      <div className="lg:ml-[13rem]  pt-[6.5rem] sm:ml-[4rem ] md:ml-[6.5rem]">
+        <button
+          className="btn btn-primary  m-1 text-sm md:text-lg"
+          onClick={() => {
+            AddNew();
+          }}
+        >
+          Add New cars
+        </button>
+        <div className="table-responsive">
+          <table className="table table-striped">
+            <thead className="text-xs md:text-xl ">
               <tr>
-                <input
-                  type="text"
-                  name="name"
-                  value={values?.name}
-                  placeholder={
-                    errors.name && touched.name
-                      ? "Please enter car name"
-                      : "Enter name"
-                  }
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-                />
-                {errors.name && touched.name ? errors.name : ""}
+                <th scope="col">Name</th>
+                <th scope="col">color</th>
+                <th scope="col">price</th>
+                <th scope="col">brand</th>
+                <th scope="col">image</th>
+                <th scope="col">edit</th>
+                <th scope="col">delete</th>
               </tr>
-              <tr>
-                <input
-                  type="text"
-                  name="color"
-                  value={values?.color}
-                  placeholder={
-                    errors.color && touched.color ? errors.color : "Enter color"
-                  }
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-                />
-              </tr>
-              <tr>
-                <input
-                  name="price"
-                  type="text"
-                  value={values?.price}
-                  placeholder={
-                    errors.price && touched.price ? errors.price : "Enter price"
-                  }
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-                />
-              </tr>
-              <tr>
-                <input
-                  name="brand"
-                  type="text"
-                  value={values?.brand}
-                  onBlur={handleBlur}
-                  placeholder={
-                    errors.brand && touched.brand ? errors.brand : "Enter brand"
-                  }
-                  onChange={handleChange}
-                  className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
-                />
-              </tr>
-            </>
-          )}
-          <tr>
-            <td>
-              <div>
-                <button
-                  onClick={() => {
-                    setImage([...image, { image: "" }]);
-                  }}
-                  className="btn btn-primary"
-                >
-                  <i className="fa-solid fa-plus"></i>Add new Image
-                </button>
-                <br />
-                {image?.map((m, i) => {
+            </thead>
+            {isUpdating ? (
+              <div className="h-[100vh] mx-[350%] my-[250%] block md:mx-[300%] md:my-[130%]">
+                <i className="fa fa-spinner fa-spin md:text-4xl text-lg  text-cyan-600 m-auto "></i>
+              </div>
+            ) : (
+              <tbody className="text-xs md:text-xl ">
+                {Result?.map((i) => {
                   return (
-                    <>
-                      <Child
-                        onUploadImage={(e) => {
-                          console.log(image);
-                          let k = image;
-                          k[i] = {
-                            image: e.target.files[0],
-                          };
-                          setImage([...k]);
-                          console.log([...k], "k");
-                          setFieldValue("car_file", k);
-                        }}
-                        image={m}
-                        removeimage={(e) => {
-                          let s = image;
-                          s[i] = { image: "" };
-                          setFieldValue("car_file", s);
-                        }}
-                      />
-                      <br />
-                    </>
+                    <tr>
+                      <td> {i?.name}</td>
+                      <td>{i?.color}</td>
+                      <td>{i?.price}</td>
+                      <td>{i?.brand}</td>
+                      <td>
+                        {i.image.map((images) => (
+                          <img
+                            src={`${process.env.REACT_APP_BASE_URL}/file/${images}`}
+                            className="img-fluid rounded-lg shadow-sm mt-1"
+                            alt="image"
+                            height="200px"
+                            width="200px"
+                            onClick={() => {
+                              HandelPopUpOpen();
+                              selectUser(i);
+                              setIsImageChanging(true);
+                              setButtonTxt("update image");
+                            }}
+                          />
+                        ))}
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => {
+                            setButtonTxt("update cars");
+                            HandelPopUpOpen();
+                            selectUser(i);
+                            setIsImageChanging(false);
+                          }}
+                        >
+                          <div className="flex">
+                            <div className="">
+                              <i className="fa-solid fa-pen-to-square mr-0 md:mr-2  text-sm md:text-lg "></i>
+                            </div>
+                            <div className="text-sm hidden lg:block md:text-lg">
+                              Edit
+                            </div>
+                          </div>
+                        </button>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            del(i._id);
+                          }}
+                          className="btn btn-primary "
+                        >
+                          <div className="flex">
+                            <div>
+                              <i className="fa-solid fa-trash mr-0 md:mr-2 text-sm md:text-lg  "></i>
+                            </div>
+                            <div className="text-sm hidden lg:block md:text-lg">
+                              DELETE
+                            </div>
+                          </div>
+                        </button>
+                      </td>
+                    </tr>
                   );
                 })}
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <button
-              type="button"
-              onClick={(e) => {
-                {
-                  ButtonTxt === "Add new"
-                    ? handleSubmit()
-                    : updateUser(SelectedId, e);
-                }
-              }}
-              className="btn btn-primary mt-[5%]"
-            >
-              {isUpdating ? (
-                <i className="fa fa-spinner fa-spin text-[20px] text-center mr-2"></i>
-              ) : ButtonTxt === "Add new" ? (
-                <i className="fa-sharp fa-solid fa-plus mr-2"></i>
-              ) : (
-                <i className="fa-regular fa-pen-to-square mr-2"></i>
-              )}
-              {ButtonTxt}
-            </button>
-          </tr>
+              </tbody>
+            )}
+          </table>
         </div>
-      </Modal>
+        <Modal
+          classNames={{
+            modal: "customModal",
+            closeIcon: "color",
+          }}
+          open={isModalOpen}
+          onClose={() => HandelPopUpClose()}
+          center
+          animationDuration={300}
+          closeOnEsc={false}
+          closeOnOverlayClick={false}
+          styles={{
+            overlay: {
+              // height: "800px",
+              // padding: "20px",
+            },
+          }}
+        >
+          <div>
+            {IsImageChanging ? null : (
+              <div className="text-xs md:text-xl">
+                <tr>
+                  <input
+                    type="text"
+                    name="name"
+                    value={values?.name}
+                    placeholder={
+                      errors.name && touched.name
+                        ? "Please enter car name"
+                        : "Enter name"
+                    }
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
+                  />
+                  {errors.name && touched.name ? errors.name : ""}
+                </tr>
+                <tr>
+                  <input
+                    type="text"
+                    name="color"
+                    value={values?.color}
+                    placeholder={
+                      errors.color && touched.color
+                        ? errors.color
+                        : "Enter color"
+                    }
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
+                  />
+                </tr>
+                <tr>
+                  <input
+                    name="price"
+                    type="text"
+                    value={values?.price}
+                    placeholder={
+                      errors.price && touched.price
+                        ? errors.price
+                        : "Enter price"
+                    }
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
+                  />
+                </tr>
+                <tr>
+                  <input
+                    name="brand"
+                    type="text"
+                    value={values?.brand}
+                    onBlur={handleBlur}
+                    placeholder={
+                      errors.brand && touched.brand
+                        ? errors.brand
+                        : "Enter brand"
+                    }
+                    onChange={handleChange}
+                    className=" h-10 mt-[3%] focus:shadow-primary-outline bg-gray-900  placeholder:text-white/80 text-white/80  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300  bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-500 focus:border focus:border-solid focus:outline-none "
+                  />
+                </tr>
+              </div>
+            )}
+            <tr>
+              <td>
+                <div>
+                  <button
+                    onClick={() => {
+                      setImage([...image, { image: "" }]);
+                    }}
+                    className="btn btn-primary mt-1"
+                  >
+                    <div className="flex">
+                      {" "}
+                      <i className="fa-solid fa-plus text-xs md:text-xl"></i>
+                      <div className="text-xs md:text-lg">Add new Image</div>
+                    </div>
+                  </button>
+                  <br />
+                  {image?.map((m, i) => {
+                    return (
+                      <>
+                        <Child
+                          onUploadImage={(e) => {
+                            console.log(image);
+                            let k = image;
+                            k[i] = {
+                              image: e.target.files[0],
+                            };
+                            setImage([...k]);
+                            console.log([...k], "k");
+                            setFieldValue("car_file", k);
+                          }}
+                          image={m}
+                          removeimage={(e) => {
+                            let s = image;
+                            s[i] = { image: "" };
+                            setFieldValue("car_file", s);
+                          }}
+                        />
+                        <br />
+                      </>
+                    );
+                  })}
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <button
+                type="button"
+                onClick={(e) => {
+                  {
+                    ButtonTxt === "Add new"
+                      ? handleSubmit()
+                      : updateUser(SelectedId, e);
+                  }
+                }}
+                className="btn btn-primary mt-[5%]"
+              >
+                <div className="flex">
+                  {isUpdating ? (
+                    <i className="fa fa-spinner fa-spin text-xs md:text-lg text-center mr-2"></i>
+                  ) : ButtonTxt === "Add new" ? (
+                    <i className="fa-sharp fa-solid fa-plus text-xs md:text-lg mr-2"></i>
+                  ) : (
+                    <i className="fa-regular fa-pen-to-square text-xs md:text-lg mr-2"></i>
+                  )}
+                  <div className="text-xs md:text-lg">{ButtonTxt}</div>
+                </div>
+              </button>
+            </tr>
+          </div>
+        </Modal>
+      </div>
+      <Footer />
     </div>
   );
 }
